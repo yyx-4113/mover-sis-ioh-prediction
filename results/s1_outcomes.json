@@ -1,0 +1,183 @@
+{
+ "O1": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "MAP",
+   "threshold": 55,
+   "minutes": 5,
+   "gap_tolerance": 0
+  },
+  "positive_pids": 16,
+  "denominator_pids": 16861,
+  "prevalence": 0.0009,
+  "first_event_times_recorded": 16
+ },
+ "O2": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "MAP",
+   "threshold": 55,
+   "minutes": 5,
+   "gap_tolerance": 1
+  },
+  "positive_pids": 60,
+  "denominator_pids": 16861,
+  "prevalence": 0.0036,
+  "first_event_times_recorded": 60
+ },
+ "O3": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "MAP",
+   "threshold": 55,
+   "minutes": 10,
+   "gap_tolerance": 1
+  },
+  "positive_pids": 2,
+  "denominator_pids": 16861,
+  "prevalence": 0.0001,
+  "first_event_times_recorded": 2
+ },
+ "O4": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "MAP",
+   "threshold": 65,
+   "minutes": 10,
+   "gap_tolerance": 1
+  },
+  "positive_pids": 32,
+  "denominator_pids": 16861,
+  "prevalence": 0.0019,
+  "first_event_times_recorded": 32
+ },
+ "B1": {
+  "definition": {
+   "type": "point_burst",
+   "signal": "MAP",
+   "threshold": 65,
+   "n_points": 3,
+   "window_minutes": 30
+  },
+  "positive_pids": 7555,
+  "denominator_pids": 16861,
+  "prevalence": 0.4481,
+  "first_event_times_recorded": 7555
+ },
+ "B2": {
+  "definition": {
+   "type": "point_burst",
+   "signal": "MAP",
+   "threshold": 65,
+   "n_points": 5,
+   "window_minutes": 60
+  },
+  "positive_pids": 5491,
+  "denominator_pids": 16861,
+  "prevalence": 0.3257,
+  "first_event_times_recorded": 5491
+ },
+ "B3": {
+  "definition": {
+   "type": "point_burst",
+   "signal": "MAP",
+   "threshold": 55,
+   "n_points": 3,
+   "window_minutes": 30
+  },
+  "positive_pids": 1252,
+  "denominator_pids": 16861,
+  "prevalence": 0.0743,
+  "first_event_times_recorded": 1252
+ },
+ "D1": {
+  "definition": {
+   "type": "exposure_fraction",
+   "signal": "MAP",
+   "threshold": 65,
+   "min_measurements": 10,
+   "fraction": 0.3
+  },
+  "positive_pids": 2506,
+  "denominator_pids": 16861,
+  "prevalence": 0.1486,
+  "first_event_times_recorded": 2506
+ },
+ "D2": {
+  "definition": {
+   "type": "exposure_fraction",
+   "signal": "MAP",
+   "threshold": 55,
+   "min_measurements": 10,
+   "fraction": 0.3
+  },
+  "positive_pids": 77,
+  "denominator_pids": 16861,
+  "prevalence": 0.0046,
+  "first_event_times_recorded": 77
+ },
+ "E1": {
+  "definition": {
+   "type": "any_below",
+   "signal": "MAP",
+   "threshold": 55
+  },
+  "positive_pids": 4050,
+  "denominator_pids": 16861,
+  "prevalence": 0.2402,
+  "first_event_times_recorded": 4050
+ },
+ "E2": {
+  "definition": {
+   "type": "any_below",
+   "signal": "MAP",
+   "threshold": 65
+  },
+  "positive_pids": 11444,
+  "denominator_pids": 16861,
+  "prevalence": 0.6787,
+  "first_event_times_recorded": 11444
+ },
+ "O5": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "SpO2",
+   "threshold": 90,
+   "minutes": 2,
+   "gap_tolerance": 0
+  },
+  "positive_pids": 1697,
+  "denominator_pids": 16861,
+  "prevalence": 0.1006,
+  "first_event_times_recorded": 1697
+ },
+ "O6": {
+  "definition": {
+   "type": "sustained_grid",
+   "signal": "SpO2",
+   "threshold": 92,
+   "minutes": 5,
+   "gap_tolerance": 0
+  },
+  "positive_pids": 663,
+  "denominator_pids": 16861,
+  "prevalence": 0.0393,
+  "first_event_times_recorded": 663
+ },
+ "S1": {
+  "definition": {
+   "type": "sustained_measured",
+   "signal": "MAP",
+   "threshold": 65,
+   "minutes": 10,
+   "gap_tolerance": 1
+  },
+  "positive_pids": 1308,
+  "denominator_pids": 16861,
+  "prevalence": 0.0776,
+  "first_event_times_recorded": 1308
+ },
+ "primary_id": "D1",
+ "engine_version": "v1.2.0-grid",
+ "note": "v1.1.0 起 sustained_grid 类型在 1-min 网格上判定，NaN 计为中断。v1.0.0 的 dropna 压缩时间轴缺陷已修复，其 MAP 侧数字全部作废。本通道为全 OR 窗口口径，仅作队列描述；建模标签见 s1_outcomes_postanchor.json。"
+}
