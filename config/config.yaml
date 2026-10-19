@@ -1,0 +1,125 @@
+# 中心配置 — 方向 01 SIS IOH 预测
+# 所有脚本从这里读参数；禁止在脚本内硬编码路径/阈值/种子
+project:
+  name: "SIS术中低血压预测"
+  direction_id: "01"
+  author: "Yongxin Yang"
+  orcid: "0009-0004-9698-6552"
+  created: "2026-10-19"
+  protocol_version: "v0.2-draft"   # v0.2 = Round1 审查 P0 修复后；建模前必须冻结
+
+# 工作区根（相对本文件定位，脚本启动时自动解析）
+paths:
+  workspace_root: "../../"        # D:/2026.10/Mover数据库
+  sis_emr_dir: "../../data_raw/_sis_emr_x/EMR"
+  sis_vitals_flat: "../../data_raw/sis_vitals.csv"
+  results_dir: "results"          # 相对项目根（directions/01_.../results）
+  review_dir: "review"
+
+# 数据文件
+inputs:
+  patient_information: "patient_information.csv"
+  patient_vitals: "patient_vitals.csv"
+  patient_observations: "patient_observations.csv"
+  patient_ventilator: "patient_ventilator.csv"
+  patient_medication: "patient_medication.csv"
+  patient_labs: "patient_labs.csv"
+  patient_input_output: "patient_input_output.csv"
+  patient_procedure_events: "patient_procedure_events.csv"
+  patient_a_line: "patient_a_line.csv"
+
+# 队列规则（protocol §2）
+cohort:
+  min_age: 18
+  min_or_window_minutes: 60        # OR 窗口内 1-min 观测下限
+  max_or_window_minutes: 1440      # v1.1.0 新增：OR 窗口上界（0<or_min<=1440，剔除脏时间戳）
+
+# 结局定义（protocol §3 敏感性矩阵）
+# type 取值（v1.1.0 引擎支持）：
+#   sustained_grid     —— 1-min 网格上连续 >=minutes 分钟 <threshold（NaN 计为中断）【主口径】
+#   sustained_measured —— 仅在已测量分钟上判 run（会高估；仅用于量化点测数据下持续事件不可判定的程度）
+#   point_burst        —— >=n_points 次低值测量落在 window_minutes 内（NIBP 点测可算口径）
+#   exposure_fraction  —— >=min_measurements 次测量且低值占比 >=fraction（把点测转为"暴露比例"）
+#   any_below          —— 任一记录分钟低于阈值
+outcomes:
+  # Round 1 审查建议值；原 O2（MAP<55>=5min）在网格法下仅 60 事件，不可用作主结局。
+  # ⚠️ 待 protocol 冻结时由作者最终确认。
+  primary_id: "D1"
+  definitions:
+    # ---- MAP 维度：持续型（网格法，NaN=中断）----
+    O1: {type: sustained_grid, signal: "MAP", threshold: 55, minutes: 5, gap_tolerance: 0}
+    O2: {type: sustained_grid, signal: "MAP", threshold: 55, minutes: 5, gap_tolerance: 1}
+    O3: {type: sustained_grid, signal: "MAP", threshold: 55, minutes: 10, gap_tolerance: 1}
+    O4: {type: sustained_grid, signal: "MAP", threshold: 65, minutes: 10, gap_tolerance: 1}
+    # ---- MAP 维度：点测爆发型（NIBP 可算）----
+    B1: {type: point_burst, signal: "MAP", threshold: 65, n_points: 3, window_minutes: 30}
+    B2: {type: point_burst, signal: "MAP", threshold: 65, n_points: 5, window_minutes: 60}
+    B3: {type: point_burst, signal: "MAP", threshold: 55, n_points: 3, window_minutes: 30}
+    # ---- MAP 维度：暴露比例型（Round 1 推荐主结局族）----
+    D1: {type: exposure_fraction, signal: "MAP", threshold: 65, min_measurements: 10, fraction: 0.30}
+    D2: {type: exposure_fraction, signal: "MAP", threshold: 55, min_measurements: 10, fraction: 0.30}
+    # ---- MAP 维度：任一记录低于阈值 ----
+    E1: {type: any_below, signal: "MAP", threshold: 55}
+    E2: {type: any_below, signal: "MAP", threshold: 65}
+    # ---- SpO2 维度（覆盖率 96%，网格法与原口径一致）----
+    O5: {type: sustained_grid, signal: "SpO2", threshold: 90, minutes: 2, gap_tolerance: 0}
+    O6: {type: sustained_grid, signal: "SpO2", threshold: 92, minutes: 5, gap_tolerance: 0}
+    # ---- 敏感性口径：仅已测量分钟判 run（已知会高估，仅用于说明点测结构限制）----
+    S1: {type: sustained_measured, signal: "MAP", threshold: 65, minutes: 10, gap_tolerance: 1}
+
+# 预测窗（protocol §4）
+prediction:
+  early_window_minutes: 15         # 诱导后前 15 min 生理作预测因子（特征截断窗 = [anchor-15min, anchor]）
+  # 结局标签窗为锚点后至 OR_end（中位 147 min），由 s1_labels_postanchor.csv 提供；
+  # horizon_minutes 仅作设计意图记录，未被结局引擎消费（引擎按 outcome_source=post_anchor 取全段）。
+  horizon_minutes: 60
+
+# 时间切分（protocol §5）
+temporal_split:
+  train_start: "2015-11-01"
+  train_end: "2017-12-31"
+  test_start: "2018-01-01"
+  test_end: "2018-10-03"           # 实测数据上界
+
+# 特征工程（protocol §4；s2 消费）
+features:
+  window_minutes: 15                # 预测窗 = [anchor-15min, anchor]，全部特征须早于 anchor
+  outcome_source: "post_anchor"     # 建模标签一律取锚点后窗口（s1_labels_postanchor.csv）
+  # 手术分组关键词（冻结 2026-10-19；由 scripts/audit/a6_procedure_groups.py 迭代至 OTHER=2.48%）
+  # 用法：文本小写+非字母数字转空格后，按本表顺序做"首个命中"匹配；
+  #       仍未命中者走受控模糊兜底（编辑距离<=1、首字符相同、词长>=7），命中日志落
+  #       results/s2_fuzzy_match_log.csv；再未命中记 OTHER。
+  # 顺序即优先级：先专后泛，复合词优先于单词。NEURO 含脊柱手术（脊柱在 IOH 风险上
+  # 与颅脑手术相近，且 SIS 脊柱术式常由神经外科实施，不单列）。
+  procedure_group_keywords:
+    NO_SURGERY: ["no surgery performed", "no surgery"]
+    CARDIAC: ["cabg", "coronary artery bypass", "cardiopulmonary bypass", "on pump", "off pump", "valve replacement", "valve repair", "aortic valve", "mitral valve", "tricuspid", "heart transplant", "cardiac tumor", "myectomy", "maze procedure", "lvad", "ascending aorta", "aortic root", "aortic dissection", "tevar", "pericardiectomy", "pericardial window", "heart cath", "cardiac catheterization", "cardioversion", "ductus arteriosus", "transesophageal echocardiography", "tee"]
+    NEURO: ["craniotomy", "craniectomy", "cranioplasty", "burr hole", "ventriculoperitoneal", "vp shunt", "cerebral aneurysm", "brain aneurysm", "intracranial aneurysm", "avm", "arteriovenous malformation", "deep brain stimulator", "dbs implantation", "transsphenoidal", "pituitary", "meningioma", "acoustic neuroma", "brain tumor", "brain biopsy", "microvascular decompression", "chiari", "tethered cord", "vagus nerve stimulator", "eeg", "electrode", "spinal cord", "spine surgery", "laminectomy", "laminotomy", "discectomy", "foraminotomy", "corpectomy", "vertebrectomy", "spinal fusion", "spondylodesis", "cervical fusion", "lumbar fusion", "instrumented fusion", "instrumentation and fusion", "skull", "cerebral", "brain", "neuro", "spinal stimulator", "implantable pulse generator", "stereotactic", "rosa", "lumbar", "cervical", "thoracolumbar", "sacral", "fusion", "decompression", "kyphoplasty", "scoliosis", "interbody", "laminectomies", "foraminotomies", "pulse generator", "generator", "electromyography", "nerve monitoring", "spinal", "stenosis", "vertebra", "spine", "disk", "disc"]
+    THORACIC: ["lobectomy", "pneumonectomy", "wedge resection", "thoracotomy", "thoracoscopy", "vats", "decortication", "pleurodesis", "pleurectomy", "mediastinoscopy", "thymectomy", "esophagectomy", "esophagotomy", "heller myotomy", "nissen", "fundoplication", "zenker", "tracheal resection", "bronchoscopy", "chest wall", "rib resection", "lung biopsy", "lung resection", "pulmonary resection", "pleural", "syrinx", "sympathectomy", "diaphragm", "mediastinal", "thoracic"]
+    VASCULAR: ["endarterectomy", "aneurysm repair", "bypass graft", "fem pop", "femoral femoral", "axillo femoral", "axillo bifemoral", "av fistula", "av graft", "dialysis access", "arteriovenous graft", "arteriovenous fistula", "radiocephalic", "brescia cimino", "angioplasty", "stent graft", "thrombectomy", "embolectomy", "varicose", "saphenous", "vein stripping", "vein ablation", "amputation", "fasciotomy", "aorto", "ivc filter", "vena cava", "vascular shunt", "endovascular aneurysm", "evar", "carotid", "vein mapping", "arteriovenous"]
+    GI: ["cholecystectomy", "appendectomy", "hernia", "herniorrhaphy", "gastrectomy", "sleeve gastrectomy", "bariatric", "bowel resection", "colectomy", "hemicolectomy", "laparotomy", "gastrostomy", "jejunostomy", "enterotomy", "whipple", "pancreaticoduodenectomy", "splenectomy", "adrenalectomy", "liver resection", "hepatectomy", "portosystemic", "tipss", "esophagogastroduodenoscopy", "egd", "colonoscopy", "endoscopy", "ercp", "esophagoscopy", "duodenoscopy", "enteroscopy", "polypectomy", "hemorrhoidectomy", "hemorroidectomy", "fistulotomy", "fistula repair", "abscess drainage", "peritoneal dialysis", "dialysis catheter", "peritoneovenous", "paracentesis", "ileostomy", "colostomy", "low anterior resection", "sigmoidoscopy", "sigmoid", "flexible sigmoidoscopy", "endoscopic ultrasound", "fine needle aspiration", "eus", "endoscopic", "laparoscop", "laparascop", "exploratory", "intraperitoneal", "peritoneal", "abdominal washout", "lysis of adhesions", "omental", "mesentery", "bowel", "ostomy", "rectopexy", "anal fissure", "anorectal", "rectal", "rectum", "colon", "appendix", "gallbladder", "pancreas", "spleen", "liver", "stomach", "gastric", "esophageal", "esophageal dilation", "esophageal manometry", "brachytherapy", "port placement", "portacath", "porta cath", "port removal", "port a cath", "incision and drainage", "drainage", "peritoneal cavity", "abdominal"]
+    UROLOGY: ["nephrectomy", "cystectomy", "prostatectomy", "transurethral resection", "turp", "turbt", "cystoscopy", "ureteroscopy", "lithotripsy", "nephrolithotomy", "pyeloplasty", "orchiectomy", "vasectomy", "circumcision", "hypospadias", "ureteral", "retrograde pyelogram", "kidney transplant", "nephroureterectomy", "cystocele", "sling procedure", "artificial urinary sphincter", "penile", "testicular", "varicocelectomy", "hydrocelectomy", "cystolitholapaxy", "prostate", "bladder", "kidney", "renal", "uro", "nephrostomy", "suprapubic", "sacral nerve stimulator", "interstim", "peyronie", "peyronies", "condyloma"]
+    GYN: ["hysterectomy", "salpingectomy", "salpingo", "oophorectomy", "oopherectomy", "fimbriectomy", "myomectomy", "myomectomies", "dilation and evacuation", "dilatation and evacuation", "dilation and aspiration", "dilatation and aspiration", "dilation and curettage", "dilatation and curettage", "dilation and currettage", "dilatation and currettage", "d c", "cerclage", "tubal ligation", "conization", "leep", "loop electrosurgical", "colposcopy", "vulvectomy", "hysteroscopy", "endometrial ablation", "cesarean", "c section", "ectopic", "obstetric", "placenta", "uterine", "vaginoplasty", "labiaplasty", "ovarian", "fallopian", "pregnancy", "obstetrical", "gyn", "prenatal", "postpartum", "curettage", "currettage", "d e", "fulgeration", "vulva", "vulvar"]
+    ORTHO: ["arthroplasty", "total knee", "total hip", "shoulder replacement", "hemiarthroplasty", "knee arthroscopy", "acl reconstruction", "meniscectomy", "rotator cuff", "orif", "open reduction", "fracture", "external fixation", "external fixator", "intramedullary", "nailing", "percutaneous pinning", "pelvic ring", "pelvic fixation", "femur", "tibia", "humerus", "radius", "ulna", "clavicle", "coccygectomy", "arthrodesis", "joint replacement", "joint injection", "osteotomy", "bone graft", "hand surgery", "tendon repair", "trigger release", "carpal tunnel", "bunion", "hallux", "de quervain", "ganglion cyst", "hardware removal", "removal of hardware", "crush injury", "arthrocentesis", "aspiration", "arthroscop", "bone biopsy", "amputation", "tendon", "ligament", "muscle biopsy", "soft tissue mass", "release procedure", "manipulation", "hammertoe", "tenotomy", "toe", "thumb", "finger", "foot", "hand", "wrist", "ankle", "elbow", "knee", "hip", "shoulder", "transfer", "tendon transfer"]
+    ENT: ["thyroidectomy", "parathyroidectomy", "thyroid lobectomy", "tonsillectomy", "adenoidectomy", "septoplasty", "sinus surgery", "fess", "endoscopic sinus", "tympanoplasty", "mastoidectomy", "stapedectomy", "cochlear implant", "laryngectomy", "tracheostomy", "tracheotomy", "parotidectomy", "neck dissection", "glossectomy", "maxillectomy", "mandibulectomy", "cleft palate", "uvulopalatopharyngoplasty", "upap", "sleep apnea surgery", "laryngoscopy", "microlaryngoscopy", "thyroplasty", "vocal cord", "thyroid", "parathyroid", "tonsil", "adenoid", "septum", "sinus", "ear tube", "myringotomy", "mastoid", "salivary", "mandible", "mandibular", "maxilla", "maxillomandibular", "palate", "pharynx", "tongue", "airway", "bronchoscope", "head and neck", "thyroglossal", "submandibular", "buccal", "tooth", "dental", "gland removal", "turbinate", "intranasal", "nasal", "nose", "septal"]
+    OPHTHO: ["cataract", "phaco", "intraocular lens", "vitrectomy", "retina", "corneal transplant", "keratoplasty", "glaucoma", "trabeculectomy", "pterygium", "strabismus", "enucleation", "orbit", "orbitotomy", "blepharoplasty", "eye", "ocular", "cornea", "lens", "scleral", "iridectomy", "dacryocystorhinostomy", "globe"]
+    PLASTIC: ["breast augmentation", "mastopexy", "abdominoplasty", "liposuction", "rhinoplasty", "facelift", "otoplasty", "brachioplasty", "body lift", "breast reconstruction", "flap", "skin graft", "burn", "debridement", "reconstructive", "scar revision", "mole removal", "cyst removal", "breast", "skin lesion", "lipoma", "plastic", "soft tissue", "wound", "closure", "revision", "augmentation", "mastectomy", "lumpectomy", "reduction mammoplasty", "gynecomastia", "hair transplant", "wide local excision", "lymph node", "melanoma", "sarcoma", "resection", "tumor", "mass", "oncolog", "cancer", "carcinoma", "lymphadenectomy", "expander", "alloderm", "condylectomy", "biopsy"]
+
+# 建模（protocol §6-7）
+modeling:
+  seed: 12345
+  cv_folds: 5
+  class_weight: "balanced"
+  calibration: "isotonic_oof"
+  primary_metric: "AUPRC"
+  bootstrap_resamples: 1000
+  bootstrap_level: "patient"       # SIS 为 PID 级单记录，仍按患者级报告
+  # 预测锚点（protocol §4 v0.2 新增）：Intubation 事件为主锚，缺失时用 Surgery_start 并报告代理比例
+  anchor_event: "Intubation"
+  anchor_fallback: "Surgery_start"
+
+# 运行环境
+runtime:
+  python: "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
+  pandas: "2.3.3"
+  numpy: "2.4.6"
