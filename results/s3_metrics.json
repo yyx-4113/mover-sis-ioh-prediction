@@ -1,0 +1,164 @@
+{
+ "stage": "s3",
+ "version": "v1.0.0",
+ "primary_id": "D1",
+ "primary_metric": "AUPRC",
+ "seed": 12345,
+ "n_bootstrap": 1000,
+ "n_total": 16861,
+ "prevalence": 0.1555,
+ "results": [
+  {
+   "model": "baseline_logit",
+   "split": "patient",
+   "n_train": 13488,
+   "n_test": 3373,
+   "n_pos_test": 525,
+   "auprc": 0.2336,
+   "auprc_ci95": [
+    0.20685895854016592,
+    0.26805626464045096
+   ],
+   "auroc": 0.6256,
+   "auroc_ci95": [
+    0.596811659213004,
+    0.6532162603208717
+   ],
+   "brier": 0.2392,
+   "pred_mean": 0.4867
+  },
+  {
+   "model": "logistic_full",
+   "split": "patient",
+   "n_train": 13488,
+   "n_test": 3373,
+   "n_pos_test": 525,
+   "auprc": 0.3014,
+   "auprc_ci95": [
+    0.26837040307395377,
+    0.33962783010806336
+   ],
+   "auroc": 0.7069,
+   "auroc_ci95": [
+    0.6823984828103458,
+    0.729405791642642
+   ],
+   "brier": 0.2156,
+   "pred_mean": 0.4338
+  },
+  {
+   "model": "xgboost",
+   "split": "patient",
+   "n_train": 13488,
+   "n_test": 3373,
+   "n_pos_test": 525,
+   "auprc": 0.3473,
+   "auprc_ci95": [
+    0.30886331490156826,
+    0.38748414746845633
+   ],
+   "auroc": 0.7223,
+   "auroc_ci95": [
+    0.6969163060163981,
+    0.7453370641284187
+   ],
+   "brier": 0.1905,
+   "pred_mean": 0.3969
+  },
+  {
+   "model": "lightgbm",
+   "split": "patient",
+   "n_train": 13488,
+   "n_test": 3373,
+   "n_pos_test": 525,
+   "auprc": 0.3368,
+   "auprc_ci95": [
+    0.3009413653172125,
+    0.37548116117810787
+   ],
+   "auroc": 0.7236,
+   "auroc_ci95": [
+    0.6986326912309894,
+    0.7453374627344094
+   ],
+   "brier": 0.1827,
+   "pred_mean": 0.38
+  },
+  {
+   "model": "baseline_logit",
+   "split": "temporal",
+   "n_train": 15043,
+   "n_test": 1818,
+   "n_pos_test": 291,
+   "auprc": 0.2429,
+   "auprc_ci95": [
+    0.20917863514872262,
+    0.2881527862197116
+   ],
+   "auroc": 0.6088,
+   "auroc_ci95": [
+    0.5744776483737611,
+    0.6459890495515794
+   ],
+   "brier": 0.2395,
+   "pred_mean": 0.4846
+  },
+  {
+   "model": "logistic_full",
+   "split": "temporal",
+   "n_train": 15043,
+   "n_test": 1818,
+   "n_pos_test": 291,
+   "auprc": 0.3355,
+   "auprc_ci95": [
+    0.2889845687391822,
+    0.39427924501583
+   ],
+   "auroc": 0.7252,
+   "auroc_ci95": [
+    0.6930905459997023,
+    0.7566288236074923
+   ],
+   "brier": 0.2265,
+   "pred_mean": 0.4632
+  },
+  {
+   "model": "xgboost",
+   "split": "temporal",
+   "n_train": 15043,
+   "n_test": 1818,
+   "n_pos_test": 291,
+   "auprc": 0.3392,
+   "auprc_ci95": [
+    0.2909561658479273,
+    0.3949737998776134
+   ],
+   "auroc": 0.7328,
+   "auroc_ci95": [
+    0.7029250980159911,
+    0.762365600126604
+   ],
+   "brier": 0.1935,
+   "pred_mean": 0.4098
+  },
+  {
+   "model": "lightgbm",
+   "split": "temporal",
+   "n_train": 15043,
+   "n_test": 1818,
+   "n_pos_test": 291,
+   "auprc": 0.3367,
+   "auprc_ci95": [
+    0.2896640392411151,
+    0.3919065061193827
+   ],
+   "auroc": 0.7316,
+   "auroc_ci95": [
+    0.7030726029225013,
+    0.7608561349226187
+   ],
+   "brier": 0.1879,
+   "pred_mean": 0.3968
+  }
+ ]
+}

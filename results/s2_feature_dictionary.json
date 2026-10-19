@@ -1,0 +1,1243 @@
+{
+ "n_features": 207,
+ "n_rows": 16861,
+ "window_minutes": 15,
+ "features": [
+  {
+   "feature": "anchor_is_intubation",
+   "domain": "anchor",
+   "source": "s1_anchor.anchor_source",
+   "window": "at anchor"
+  },
+  {
+   "feature": "anchor_minus_or_start",
+   "domain": "anchor",
+   "source": "anchor_time - OR_start",
+   "window": "at anchor"
+  },
+  {
+   "feature": "or_year",
+   "domain": "anchor",
+   "source": "OR_start",
+   "window": "at anchor"
+  },
+  {
+   "feature": "age",
+   "domain": "demographics",
+   "source": "patient_information",
+   "window": "static"
+  },
+  {
+   "feature": "male",
+   "domain": "demographics",
+   "source": "patient_information",
+   "window": "static"
+  },
+  {
+   "feature": "height_cm",
+   "domain": "demographics",
+   "source": "patient_information",
+   "window": "static"
+  },
+  {
+   "feature": "weight_kg",
+   "domain": "demographics",
+   "source": "patient_information",
+   "window": "static"
+  },
+  {
+   "feature": "bmi",
+   "domain": "demographics",
+   "source": "patient_information",
+   "window": "static"
+  },
+  {
+   "feature": "bmi_missing",
+   "domain": "demographics",
+   "source": "derived: bmi isna",
+   "window": "static"
+  },
+  {
+   "feature": "sg_NO_SURGERY",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_CARDIAC",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_NEURO",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_THORACIC",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_VASCULAR",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_GI",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_UROLOGY",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_GYN",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_ORTHO",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_ENT",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_OPHTHO",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_PLASTIC",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "sg_OTHER",
+   "domain": "surgery",
+   "source": "Procedure keywords",
+   "window": "static"
+  },
+  {
+   "feature": "surg_group",
+   "domain": "surgery",
+   "source": "Procedure (string)",
+   "window": "static"
+  },
+  {
+   "feature": "ev_cpr",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[CPR]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_cse",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[CSE]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_epidural",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Epidural]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_extubation",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Extubation]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_intubation",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Intubation]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_lma",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[LMA]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_md_handoff",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[MD Handoff]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_mayfield",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Mayfield]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_sedation",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Sedation]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_spinal",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[Spinal]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ev_tq_up",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events[TQ Up]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "n_events_pre_anchor",
+   "domain": "anesthesia_technique",
+   "source": "patient_procedure_events",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "sbp_mean",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "sbp_min",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "sbp_max",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "sbp_sd",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "sbp_n",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "sbp_last",
+   "domain": "vitals_nibp",
+   "source": "nSBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_mean",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_min",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_max",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_sd",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_n",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_last",
+   "domain": "vitals_nibp",
+   "source": "nMAP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_mean",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_min",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_max",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_sd",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_n",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "dbp_last",
+   "domain": "vitals_nibp",
+   "source": "nDBP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_mean",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_min",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_max",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_sd",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_n",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hr_last",
+   "domain": "vitals_nibp",
+   "source": "HRe",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_mean",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_min",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_max",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_sd",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_n",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "hrp_last",
+   "domain": "vitals_nibp",
+   "source": "HRp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_mean",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_min",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_max",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_sd",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_n",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "spo2_last",
+   "domain": "vitals_nibp",
+   "source": "SP02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_frac_below_65",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_frac_below_55",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_n_below_65",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_n_below_55",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_minutes_since_last",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "map_slope",
+   "domain": "vitals_nibp_derived",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "vitals_window_actual_min",
+   "domain": "qa",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "vitals_window_n_records",
+   "domain": "qa",
+   "source": "patient_vitals",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "has_art_line",
+   "domain": "invasive_monitoring",
+   "source": "patient_observations[MAP_ART]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_mean",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_min",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_max",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_sd",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_n",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_last",
+   "domain": "invasive_monitoring",
+   "source": "MAP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_mean",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_min",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_max",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_sd",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_n",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_sbp_last",
+   "domain": "invasive_monitoring",
+   "source": "SBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_mean",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_min",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_max",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_sd",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_n",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_dbp_last",
+   "domain": "invasive_monitoring",
+   "source": "DBP_ART",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_mean",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_min",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_max",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_sd",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_n",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "temp_last",
+   "domain": "invasive_monitoring",
+   "source": "Temp",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_mean",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_min",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_max",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_sd",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_n",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "cvp_last",
+   "domain": "invasive_monitoring",
+   "source": "CVPm",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "art_map_frac_below_65",
+   "domain": "invasive_monitoring",
+   "source": "patient_observations[MAP_ART]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "has_vent_record",
+   "domain": "ventilation",
+   "source": "patient_ventilator",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_sevoflurane",
+   "domain": "ventilation",
+   "source": "patient_ventilator[Agent=S]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_nitrous",
+   "domain": "ventilation",
+   "source": "patient_ventilator[Agent=N]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_desflurane",
+   "domain": "ventilation",
+   "source": "patient_ventilator[Agent=D]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_isoflurane",
+   "domain": "ventilation",
+   "source": "patient_ventilator[Agent=I]",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_mean",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_min",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_max",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_sd",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_n",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "agent_fi_last",
+   "domain": "ventilation",
+   "source": "Agent_Fi",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_mean",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_min",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_max",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_sd",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_n",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "peep_last",
+   "domain": "ventilation",
+   "source": "PEEP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_mean",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_min",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_max",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_sd",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_n",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "fio2_last",
+   "domain": "ventilation",
+   "source": "FI02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_mean",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_min",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_max",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_sd",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_n",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "etco2_last",
+   "domain": "ventilation",
+   "source": "ETC02",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_mean",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_min",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_max",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_sd",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_n",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "tv_last",
+   "domain": "ventilation",
+   "source": "TV",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_mean",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_min",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_max",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_sd",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_n",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "rr_last",
+   "domain": "ventilation",
+   "source": "RR",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_mean",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_min",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_max",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_sd",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_n",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "pip_last",
+   "domain": "ventilation",
+   "source": "PIP",
+   "window": "[anchor-15min, anchor]"
+  },
+  {
+   "feature": "drug_phenyl_n",
+   "domain": "medication",
+   "source": "patient_medication[phenylephrine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_phenyl_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[phenylephrine,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_ephedrine_n",
+   "domain": "medication",
+   "source": "patient_medication[ephedrine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_ephedrine_total_mg",
+   "domain": "medication",
+   "source": "patient_medication[ephedrine,mg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_norepi_n",
+   "domain": "medication",
+   "source": "patient_medication[norepinephrine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_norepi_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[norepinephrine,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_epi_n",
+   "domain": "medication",
+   "source": "patient_medication[epinephrine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_epi_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[epinephrine,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_vaso_n",
+   "domain": "medication",
+   "source": "patient_medication[vasopressin]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_vaso_total_units",
+   "domain": "medication",
+   "source": "patient_medication[vasopressin,units]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_dopa_n",
+   "domain": "medication",
+   "source": "patient_medication[dopamine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_atropine_n",
+   "domain": "medication",
+   "source": "patient_medication[atropine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_fentanyl_n",
+   "domain": "medication",
+   "source": "patient_medication[fentanyl]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_fentanyl_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[fentanyl,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_sufent_n",
+   "domain": "medication",
+   "source": "patient_medication[sufentanil]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_sufent_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[sufentanil,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_hydro_n",
+   "domain": "medication",
+   "source": "patient_medication[hydromorphone]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_propofol_n",
+   "domain": "medication",
+   "source": "patient_medication[propofol]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_propofol_total_mg",
+   "domain": "medication",
+   "source": "patient_medication[propofol,mg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_midazolam_n",
+   "domain": "medication",
+   "source": "patient_medication[midazolam]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_midazolam_total_mg",
+   "domain": "medication",
+   "source": "patient_medication[midazolam,mg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_dexmed_n",
+   "domain": "medication",
+   "source": "patient_medication[dexmedetomidine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_dexmed_total_mcg",
+   "domain": "medication",
+   "source": "patient_medication[dexmedetomidine,mcg]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_ketamine_n",
+   "domain": "medication",
+   "source": "patient_medication[ketamine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_nmb_n",
+   "domain": "medication",
+   "source": "patient_medication[rocuronium|vecuronium|cisatracurium|succinylcholine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "drug_neostig_n",
+   "domain": "medication",
+   "source": "patient_medication[neostigmine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "vasoactive_n_doses",
+   "domain": "medication_derived",
+   "source": "sum of vasoactive n",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "minutes_to_first_vasoactive",
+   "domain": "medication_derived",
+   "source": "first vasoactive Start_time - OR_start",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_na",
+   "domain": "labs",
+   "source": "patient_labs[Na] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_k",
+   "domain": "labs",
+   "source": "patient_labs[K] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_ca",
+   "domain": "labs",
+   "source": "patient_labs[Ca] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_gluc",
+   "domain": "labs",
+   "source": "patient_labs[Gluc] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_ph",
+   "domain": "labs",
+   "source": "patient_labs[Ph] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_pco2",
+   "domain": "labs",
+   "source": "patient_labs[PCO2] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_po2",
+   "domain": "labs",
+   "source": "patient_labs[PO2] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_be",
+   "domain": "labs",
+   "source": "patient_labs[BE] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_hco3",
+   "domain": "labs",
+   "source": "patient_labs[HCO3] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_hgb",
+   "domain": "labs",
+   "source": "patient_labs[HgB] last <= anchor",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "has_lab",
+   "domain": "labs",
+   "source": "patient_labs",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "lab_n_pre_anchor",
+   "domain": "labs",
+   "source": "patient_labs",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "crystalloid_in_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[crystalloid]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "colloid_in_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[colloid]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "blood_products_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[blood]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "urine_out_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[urine]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "ebl_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[ebl]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "other_output_ml",
+   "domain": "fluids",
+   "source": "patient_input_output[other_out]",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "has_io_record",
+   "domain": "fluids",
+   "source": "patient_input_output",
+   "window": "<= anchor"
+  },
+  {
+   "feature": "io_n_records_pre_anchor",
+   "domain": "fluids",
+   "source": "patient_input_output",
+   "window": "<= anchor"
+  }
+ ]
+}

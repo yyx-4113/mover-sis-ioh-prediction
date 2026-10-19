@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "MOVER/SIS Intraoperative Hypotension Prediction — Reproduction Package"
+abstract: "Analysis code, configuration, audit trail and aggregate results for the development and internal validation of an anchor-based model predicting cumulative intraoperative hypotension burden from pre-induction data in the MOVER/SIS cohort."
+authors:
+  - family-names: "Yang"
+    given-names: "Yongxin"
+    orcid: "https://orcid.org/0009-0004-9698-6552"
+    affiliation: "Department of Anesthesiology, The Second Affiliated Hospital of Fujian University of Traditional Chinese Medicine, Fuzhou, China"
+license: MIT
+repository-code: "https://github.com/yyx-4113/mover-sis-ioh-prediction"
+keywords:
+  - intraoperative hypotension
+  - machine learning
+  - clinical prediction model
+  - MOVER
+  - perioperative medicine
+  - calibration

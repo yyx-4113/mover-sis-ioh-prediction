@@ -1,0 +1,22 @@
+{
+ "source_pids": 19114,
+ "excl_missing_or_window": 0,
+ "or_start_nat": 0,
+ "or_end_nat": 0,
+ "excl_implausible_or_window": 8,
+ "implausible_detail": {
+  "or_min_le_0": 4,
+  "or_min_gt_1440": 4,
+  "or_min_max_observed": 3156668.0
+ },
+ "excl_short_or_window": 1632,
+ "excl_underage": 371,
+ "analytic_pids": 16861,
+ "or_window_observations": 3559993,
+ "or_min_median": 167.0,
+ "excl_bad_anchor": 242,
+ "anchor_source_counts": {
+  "Intubation": 13834,
+  "Surgery_start": 3027
+ }
+}

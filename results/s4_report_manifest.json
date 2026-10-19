@@ -1,0 +1,12 @@
+{
+ "stage": "s4",
+ "status": "skeleton",
+ "artefacts_seen": [
+  "s1_cohort.json",
+  "s1_data_quality.json",
+  "s1_labels.csv",
+  "s1_outcomes.json",
+  "s2_feature_dict.json",
+  "s3_metrics.json"
+ ]
+}
