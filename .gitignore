@@ -1,0 +1,17 @@
+# Patient-level derived data (regenerable from MOVER under DUA; not redistributed)
+results/s1_anchor.csv
+results/s1_labels.csv
+results/s1_labels_postanchor.csv
+results/s2_features.csv
+results/s2_procedure_groups.csv
+results/s2_fuzzy_match_log.csv
+scripts/results/s2_procedure_groups.csv
+scripts/results/s2_fuzzy_match_log.csv
+
+# WorkBuddy internal memory (project notes, not part of the reproduction package)
+.workbuddy/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
