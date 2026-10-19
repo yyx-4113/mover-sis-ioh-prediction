@@ -1,0 +1,104 @@
+{
+ "xgboost_top25": [
+  {
+   "feature": "map_mean",
+   "gain": 175.48867797851562
+  },
+  {
+   "feature": "map_max",
+   "gain": 75.23734283447266
+  },
+  {
+   "feature": "anchor_is_intubation",
+   "gain": 72.1629638671875
+  },
+  {
+   "feature": "ev_intubation",
+   "gain": 69.1360092163086
+  },
+  {
+   "feature": "anchor_minus_or_start",
+   "gain": 64.12760162353516
+  },
+  {
+   "feature": "map_frac_below_65",
+   "gain": 52.88066864013672
+  },
+  {
+   "feature": "sg_GI",
+   "gain": 48.62272644042969
+  },
+  {
+   "feature": "dbp_mean",
+   "gain": 45.01955032348633
+  },
+  {
+   "feature": "art_dbp_min",
+   "gain": 44.71746826171875
+  },
+  {
+   "feature": "art_map_mean",
+   "gain": 43.220542907714844
+  },
+  {
+   "feature": "art_sbp_max",
+   "gain": 40.40324783325195
+  },
+  {
+   "feature": "pip_n",
+   "gain": 40.31706619262695
+  },
+  {
+   "feature": "art_sbp_min",
+   "gain": 39.989013671875
+  },
+  {
+   "feature": "agent_sevoflurane",
+   "gain": 39.73918151855469
+  },
+  {
+   "feature": "etco2_min",
+   "gain": 39.60206985473633
+  },
+  {
+   "feature": "map_last",
+   "gain": 39.47034454345703
+  },
+  {
+   "feature": "dbp_last",
+   "gain": 39.06728744506836
+  },
+  {
+   "feature": "sbp_mean",
+   "gain": 38.79781723022461
+  },
+  {
+   "feature": "map_n_below_65",
+   "gain": 36.01865768432617
+  },
+  {
+   "feature": "etco2_n",
+   "gain": 35.24529266357422
+  },
+  {
+   "feature": "ev_sedation",
+   "gain": 34.94247055053711
+  },
+  {
+   "feature": "art_dbp_n",
+   "gain": 34.19058609008789
+  },
+  {
+   "feature": "fio2_max",
+   "gain": 33.60152816772461
+  },
+  {
+   "feature": "sbp_max",
+   "gain": 33.56385040283203
+  },
+  {
+   "feature": "agent_fi_n",
+   "gain": 31.82271957397461
+  }
+ ]
+}
