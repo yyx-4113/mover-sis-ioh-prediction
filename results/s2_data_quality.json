@@ -1,0 +1,302 @@
+{
+ "cohort": {
+  "n_pids": 16861,
+  "anchor_source_counts": {
+   "Intubation": 13834,
+   "Surgery_start": 3027
+  },
+  "anchor_minus_or_start_min": {
+   "p05": 7.0,
+   "p50": 15.0,
+   "p95": 46.0
+  }
+ },
+ "demographics": {
+  "gender_values": {
+   "F": 8502,
+   "M": 8355,
+   "  Unknown": 2,
+   " Unknown": 2
+  },
+  "bmi_computable": 16699,
+  "bmi_computable_pct": 0.9904,
+  "ht_missing": 141,
+  "wt_missing": 18,
+  "age_missing": 0,
+  "bmi_implausible_n": 6,
+  "ht_implausible_n": 37,
+  "wt_implausible_n": 18,
+  "plausibility_ranges": {
+   "height_cm": [
+    100.0,
+    220.0
+   ],
+   "weight_kg": [
+    25.0,
+    300.0
+   ],
+   "bmi": [
+    10.0,
+    80.0
+   ]
+  },
+  "note": "Implausible height/weight/BMI (unit-entry errors) set to missing, not imputed."
+ },
+ "procedure_groups": {
+  "counts": {
+   "GI": 4916,
+   "NEURO": 2530,
+   "ORTHO": 2407,
+   "UROLOGY": 1541,
+   "PLASTIC": 1318,
+   "VASCULAR": 1049,
+   "GYN": 992,
+   "THORACIC": 958,
+   "ENT": 418,
+   "OTHER": 348,
+   "OPHTHO": 201,
+   "CARDIAC": 177,
+   "NO_SURGERY": 6
+  },
+  "other_pct": 0.0206,
+  "fuzzy_matched_n": 45
+ },
+ "leakage_audit": [
+  {
+   "domain": "procedure_events",
+   "n_rows_merged": 37122,
+   "n_rows_after_leak_filter": 17337,
+   "n_pids": 16563,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0
+  },
+  {
+   "domain": "patient_vitals",
+   "n_rows_merged": 3397487,
+   "n_rows_after_leak_filter": 314398,
+   "n_pids": 16740,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0,
+   "window_minutes": 15,
+   "n_rows_in_window": 215658,
+   "n_pids_in_window": 16740
+  },
+  {
+   "domain": "patient_observations",
+   "n_rows_merged": 2587335,
+   "n_rows_after_leak_filter": 72371,
+   "n_pids": 4994,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0,
+   "window_minutes": 15,
+   "n_rows_in_window": 48309,
+   "n_pids_in_window": 4832
+  },
+  {
+   "domain": "patient_ventilator",
+   "n_rows_merged": 988592,
+   "n_rows_after_leak_filter": 94088,
+   "n_pids": 4854,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0,
+   "window_minutes": 15,
+   "n_rows_in_window": 62953,
+   "n_pids_in_window": 4852
+  },
+  {
+   "domain": "patient_medication",
+   "n_rows_merged": 349100,
+   "n_rows_after_leak_filter": 89990,
+   "n_pids": 16573,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0
+  },
+  {
+   "domain": "patient_labs",
+   "n_rows_merged": 13946,
+   "n_rows_after_leak_filter": 115,
+   "n_pids": 76,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0
+  },
+  {
+   "domain": "patient_input_output",
+   "n_rows_merged": 93155,
+   "n_rows_after_leak_filter": 3357,
+   "n_pids": 2794,
+   "max_used_time_minus_anchor": 0.0,
+   "n_time_nat": 0
+  }
+ ],
+ "anesthesia_technique": {
+  "n_events_pre_anchor_pids": 16563,
+  "event_counts_pre_anchor": {
+   "Intubation": 13835,
+   "Sedation": 1641,
+   "LMA": 1293,
+   "TQ Up": 219,
+   "Spinal": 176,
+   "MD Handoff": 129,
+   "CSE": 29,
+   "Epidural": 7,
+   "Extubation": 4,
+   "Mayfield": 3,
+   "CPR": 1
+  },
+  "n_pids_without_any_event": 298
+ },
+ "vitals_window": {
+  "n_pids_with_any_vital": 16740,
+  "n_pids_no_vital_in_window": 121,
+  "window_actual_min_p50": 13.0,
+  "n_records_p50": 14.0,
+  "map_measurements_in_window_p50": 3.0,
+  "map_measurements_in_window_p05": 1.0
+ },
+ "invasive_monitoring": {
+  "n_pids_with_art_in_window": 2503,
+  "art_map_measurements_p50": 15.0,
+  "temp_coverage_pct": 0.3544,
+  "cvp_coverage_pct": 0.1558
+ },
+ "ventilation": {
+  "n_pids_with_vent_in_window": 4852,
+  "agent_counts_in_window": {
+   "N": 47673,
+   "S": 14076,
+   "D": 760,
+   "I": 444
+  },
+  "agent_fi_p50": 2.0
+ },
+ "medication_unit_mismatch": {
+  "phenyl": {
+   "pattern": "phenylephrine",
+   "expected_unit": "mcg",
+   "n_rows_all": 1903,
+   "n_rows_expected_unit": 1897,
+   "units_seen": {
+    "mcg": 1897,
+    "drops": 6
+   }
+  },
+  "propofol": {
+   "pattern": "propofol",
+   "expected_unit": "mg",
+   "n_rows_all": 17683,
+   "n_rows_expected_unit": 15702,
+   "units_seen": {
+    "mg": 15702,
+    "mcg": 1981
+   }
+  }
+ },
+ "medication": {
+  "n_pids_with_drug_pre_anchor": 16573,
+  "n_records_pre_anchor": 89990,
+  "end_time_missing_pct": 0.9373,
+  "vasoactive_n_doses_p50": 0.0
+ },
+ "labs": {
+  "n_pids_with_lab_pre_anchor": 76,
+  "coverage_pct": 0.0045,
+  "analyte_non_null_in_used": {
+   "Na": 0.5478,
+   "K": 0.5565,
+   "Ca": 0.5478,
+   "Gluc": 0.6,
+   "Ph": 0.5739,
+   "PCO2": 0.5565,
+   "PO2": 0.5478,
+   "BE": 0.1391,
+   "HCO3": 0.5565,
+   "HgB": 0.513
+  }
+ },
+ "fluids": {
+  "n_pids_with_io_pre_anchor": 2794,
+  "coverage_pct": 0.1657,
+  "type_counts_pre_anchor": {
+   "Plasmalyte": 1173,
+   "Lactated ringers": 876,
+   "Urine": 389,
+   "Sodium chloride 0.9%": 292,
+   "D5W": 209,
+   "PRBC": 86,
+   "Ebl": 42,
+   "TPN": 39,
+   "Albumin human 5%": 35,
+   "Fresh frozen plasma": 32,
+   "Sodium chloride 3%": 31,
+   "Dextrose 5% 0.9 ns": 28,
+   "Dextrose 5% 0.45 ns": 27,
+   "Platelets": 24,
+   "3%NS": 14,
+   "Saline 3%": 11,
+   "Dextrose 10%": 10,
+   "D10halfNS": 9,
+   "Dextrose 5% lr": 8,
+   "Dextrose 50%": 6,
+   "D10w": 5,
+   "0.5NS": 3,
+   "Dextrose 5%": 1,
+   "D5HNk": 1,
+   "Cryoprecipitate": 1
+  }
+ },
+ "domain_coverage": {
+  "anchor": {
+   "n_features": 3,
+   "mean_non_null_pct": 1.0
+  },
+  "demographics": {
+   "n_features": 6,
+   "mean_non_null_pct": 0.9968
+  },
+  "surgery": {
+   "n_features": 14,
+   "mean_non_null_pct": 1.0
+  },
+  "anesthesia_technique": {
+   "n_features": 12,
+   "mean_non_null_pct": 1.0
+  },
+  "vitals_nibp": {
+   "n_features": 36,
+   "mean_non_null_pct": 0.9568
+  },
+  "vitals_nibp_derived": {
+   "n_features": 6,
+   "mean_non_null_pct": 0.8979
+  },
+  "qa": {
+   "n_features": 2,
+   "mean_non_null_pct": 0.9964
+  },
+  "invasive_monitoring": {
+   "n_features": 32,
+   "mean_non_null_pct": 0.1502
+  },
+  "ventilation": {
+   "n_features": 47,
+   "mean_non_null_pct": 0.3283
+  },
+  "medication": {
+   "n_features": 26,
+   "mean_non_null_pct": 1.0
+  },
+  "medication_derived": {
+   "n_features": 2,
+   "mean_non_null_pct": 0.5625
+  },
+  "labs": {
+   "n_features": 12,
+   "mean_non_null_pct": 0.1695
+  },
+  "fluids": {
+   "n_features": 8,
+   "mean_non_null_pct": 1.0
+  }
+ },
+ "leakage_audit_all_pass": true
+}
