@@ -1,0 +1,55 @@
+{
+ "column_non_null_rate": {
+  "HRe": 0.9479,
+  "HRp": 0.959,
+  "nSBP": 0.1999,
+  "nMAP": 0.1989,
+  "nDBP": 0.1995,
+  "SP02": 0.9608
+ },
+ "nmap_segment_length_distribution": {
+  "total_segments": 637188,
+  "length_1_share": 0.9618,
+  "median_length": 1.0,
+  "top_lengths": {
+   "1": 612846,
+   "2": 20614,
+   "3": 2264,
+   "4": 918,
+   "5": 262,
+   "6": 98,
+   "7": 71,
+   "8": 24
+  }
+ },
+ "nmap_measurements_per_pid": {
+  "mean": 39.862015503875966,
+  "p05": 12.0,
+  "p50": 33.0,
+  "p95": 90.0,
+  "n_lt_5": 194,
+  "n_ge_10": 16231
+ },
+ "nmap_coverage_per_pid": {
+  "mean": 0.22182501848484876,
+  "p50": 0.2196969696969697
+ },
+ "postanchor_nmap_measurements": {
+  "mean": 35.99916152602264,
+  "p05": 8.0,
+  "p50": 30.0,
+  "p95": 86.0,
+  "n_lt_5": 306,
+  "n_ge_10": 15365
+ },
+ "anchor_minus_or_start_min": {
+  "p05": 7.0,
+  "p50": 15.0,
+  "p95": 46.0
+ },
+ "post_window_minutes": {
+  "p05": 49.0,
+  "p50": 147.0,
+  "p95": 440.0
+ }
+}
