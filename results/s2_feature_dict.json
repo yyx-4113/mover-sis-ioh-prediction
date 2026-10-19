@@ -1,0 +1,6 @@
+{
+ "stage": "s2",
+ "status": "skeleton",
+ "note": "人口学特征已生成；生理轨迹与手术分组待 protocol 冻结后实现",
+ "n_pids": 19114
+}
