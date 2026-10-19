@@ -34,6 +34,11 @@ the workspace root (see `config/config.yaml`).
 - `manuscript/` — manuscript source (`manuscript_v0.1.md`, `manuscript_v0.1.docx`).
 - `protocol/`, `review/` — pre-specified protocol and review records.
 - `MANIFEST.csv` — SHA-256 checksums of all tracked result files.
+- `workflows/release.yml` — GitHub Actions CI workflow (syntax-checks the pipeline scripts and
+  validates `config/config.yaml`). **Note on location:** the file is stored here rather than the
+  canonical `.github/workflows/` path because the repository was published from a constrained
+  environment that blocks writes to `.github/workflows/`. To enable CI, copy it to
+  `.github/workflows/release.yml`.
 
 ## What is NOT included (and why)
 
