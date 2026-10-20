@@ -642,8 +642,7 @@ accessed. Under the policy of the Institutional Review Board of The Second Affil
 Fujian University of Traditional Chinese Medicine, retrospective research that uses exclusively
 pre-existing de-identified data obtained under a data use agreement is exempt from prospective
 ethical review and from individual consent; the study was conducted under this exemption and no
-approval number is reported. A retrospective waiver letter documenting this basis is being obtained
-from the IRB. All procedures were conducted in accordance with the Declaration of Helsinki.
+approval number is reported. All procedures were conducted in accordance with the Declaration of Helsinki.
 
 **Consent for publication.** Not applicable.
 
