@@ -3,7 +3,7 @@
 | Check | Status | Detail |
 |---|---|---|
 | Abstract word count <= 350 | **PASS** | 326 words (limit 350) |
-| Total word count reported | **PASS** | 10285 words |
+| Total word count reported | **PASS** | 10313 words |
 | References count == 21 | **PASS** | 21 references found |
 | References numbered contiguously 1..N | **PASS** | 1..21 |
 | docx embeds 6 figures | **PASS** | 6 images |
@@ -21,5 +21,5 @@
 ## Overall: **PASS**
 
 Abstract words: 326 / 350
-Total words: 10285
+Total words: 10313
 docx images: 6, tables: 8, references: 21

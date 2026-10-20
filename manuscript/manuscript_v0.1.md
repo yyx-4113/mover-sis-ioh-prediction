@@ -773,11 +773,14 @@ approval number is reported. All procedures were conducted in accordance with th
 
 **Consent for publication.** Not applicable.
 
-**Availability of data and materials.** The analysis used MOVER (University of California Irvine),
-which is available to qualified researchers upon signature of a data use agreement
-(https://mover.ics.uci.edu/; UCI Machine Learning Repository, https://doi.org/10.24432/C5VS5G).
-Patient-level data are not redistributed by the author, as the data use agreement does not permit
-this. All analysis code, the configuration file, the audit trail, and the aggregate result files
+**Availability of data and materials.** The development cohort was drawn from MOVER (University of
+California Irvine), which is available to qualified researchers upon signature of a data use
+agreement (https://mover.ics.uci.edu/; UCI Machine Learning Repository,
+https://doi.org/10.24432/C5VS5G). The external cohort was drawn from VitalDB
+(https://vitaldb.net/), which is publicly accessible upon free registration and is described in
+Lee et al. (2022), doi:10.1038/s41597-022-01411-5. Patient-level data are not redistributed by the
+author, as the MOVER data use agreement does not permit this. All analysis code, the configuration
+file, the audit trail, and the aggregate result files
 from which every number in this manuscript is generated are available at
 https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.0 (v1.0.0 reproduction package), together with a manifest of
 file checksums (MANIFEST.csv). Patient-level derived files (per-case feature matrix and outcome

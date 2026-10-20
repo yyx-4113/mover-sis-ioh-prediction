@@ -201,7 +201,13 @@ def build():
                                      "05_Additional_file_2_TRIPOD_AI.docx"))
     made.append((dst, "TRIPOD+AI (2024) reporting checklist, English"))
 
-    # 6. README / checklist -------------------------------------------------
+    # 6. declarations for the online fields ----------------------------------
+    s = os.path.join(ROOT, "manuscript", "06_Declarations_for_SNAPP_fields.md")
+    dst = os.path.join(OUT, "06_Declarations_for_SNAPP_fields.md")
+    shutil.copy2(s, dst)
+    made.append((dst, "field-by-field declarations to paste into the SNAPP form"))
+
+    # 7. README / checklist -------------------------------------------------
     readme = os.path.join(OUT, "00_README_submission_checklist.md")
     with open(readme, "w", encoding="utf-8") as f:
         f.write(README.format(journal=JOURNAL, url=SUBMIT_URL,
@@ -266,6 +272,11 @@ the result file that produced it, and the command that reproduces it.
 - Reporting checklist (TRIPOD+AI 2024) is attached as Additional file 2 and is in English.
 - The cover letter and the manuscript report the same numbers (external AUROC 0.744,
   AUPRC 0.158, mean predicted risk 0.36, external Brier 0.176, n = 3,735, events 214).
+- Declarations entered into the online fields are stored separately from the
+  manuscript and are the version that gets published. Paste them from
+  `06_Declarations_for_SNAPP_fields.md`, which matches the manuscript. Never type
+  "available on request" into the data availability field, and never invent an
+  ethics approval number.
 
 ## Reproducibility
 
