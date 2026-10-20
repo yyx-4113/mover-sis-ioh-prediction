@@ -415,7 +415,10 @@ under temporal validation and good calibration after isotonic recalibration. Dis
 therefore approximately 2.2-fold (2.23×) better than the no-skill baseline on the precision–recall
 scale — modest, but clearly not null — and the decision curve showed the model yielded positive net
 benefit relative to both default strategies across threshold probabilities up to 0.58
-(patient-level) and 0.73 (temporal).
+(patient-level) and 0.73 (temporal). The decision-relevant region is therefore thresholds near to
+moderately above the outcome prevalence (roughly 0.10–0.30), where the calibrated probabilities
+could support a vasopressor-readiness or enhanced-monitoring decision; the specific operating point
+remains a clinical judgement to be informed by external validation rather than settled here.
 
 ### Interpretation
 
@@ -518,6 +521,32 @@ signals, rather than in revealing hidden physiology.
    information beyond what a clinician reading the bedside monitor already has; a decision-curve
    benchmark against a MAP-only logistic model showed the full model's incremental net benefit was
    only 0.013 at threshold 0.15 (Figure 4).
+
+### What this study adds
+
+Beyond the modest absolute performance, this study contributes four elements that are under-reported
+in perioperative hypotension prediction and that hold independently of the discrimination achieved.
+
+1. **A quantitative leakage audit on a public operating-room resource.** All seven time-stamped
+   predictor domains were truncated at the prediction origin with zero residual horizon overlap
+   (maximum interval 0.00 minutes; no unparseable timestamps). Such audits are uncommon yet
+   essential wherever near-perfect discrimination has been claimed on sparse data, and they
+   convert an unverifiable "cannot be reproduced" concern into a reported, auditable fact.
+2. **A 14-definition outcome sensitivity analysis.** Apparent performance is shown to be largely an
+   artefact of the chosen hypotension definition (prevalence spanning 0.01%–65.8%), and
+   sustained-duration definitions are demonstrated to be effectively unmeasurable under the observed
+   recording density (median 3 MAP readings in the pre-anchor window; 96.2% of segments a single
+   minute). This gives future work on the same and similar resources a principled basis for choosing
+   an evaluable endpoint.
+3. **A transparent accounting of spectrum bias.** The 1,496 cases (8.9%) excluded by construction
+   because of sparse monitoring are reported alongside the conditional prevalence among evaluable
+   cases (17.1%, 2,622 of 15,365), quantifying how monitoring density shapes both the endpoint and
+   the apparent signal rather than hiding it behind a single cohort prevalence.
+4. **An honest MAP-only benchmark.** Against a logistic model using the pre-anchor mean MAP alone,
+   the full model's incremental net benefit was only 0.013 at decision thresholds 0.10–0.15; this
+   reframes the result as a calibrated risk-stratification aid anchored on the pre-induction pressure
+   rather than a discovery of new physiology, and supplies future work with a realistic baseline on
+   this resource.
 
 ## Conclusions
 
