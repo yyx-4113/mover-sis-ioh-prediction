@@ -1,0 +1,142 @@
+{
+  "primary_id": "D1",
+  "xgb_params": {
+    "n_estimators": 300,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 10,
+    "reg_lambda": 1.0,
+    "seed": 12345
+  },
+  "full_model": {
+    "patient": {
+      "n_train": 13488,
+      "n_test": 3373,
+      "n_pos_test": 525,
+      "auprc": 0.3473,
+      "auprc_ci95": [
+        0.3088634725173138,
+        0.3874855370694566
+      ],
+      "auroc": 0.7223,
+      "auroc_ci95": [
+        0.6969171140798845,
+        0.7453409049062796
+      ],
+      "brier": 0.1905,
+      "pred_mean": 0.3968
+    },
+    "temporal": {
+      "n_train": 15043,
+      "n_test": 1818,
+      "n_pos_test": 291,
+      "auprc": 0.3396,
+      "auprc_ci95": [
+        0.29360722777227716,
+        0.3972950289453497
+      ],
+      "auroc": 0.7326,
+      "auroc_ci95": [
+        0.704460682532626,
+        0.7618340292141507
+      ],
+      "brier": 0.1937,
+      "pred_mean": 0.4095
+    }
+  },
+  "core_transportable_model": {
+    "patient": {
+      "n_train": 13488,
+      "n_test": 3373,
+      "n_pos_test": 525,
+      "auprc": 0.3206,
+      "auprc_ci95": [
+        0.28432370459862844,
+        0.36150567174691306
+      ],
+      "auroc": 0.6979,
+      "auroc_ci95": [
+        0.6726994098659151,
+        0.7227829622152141
+      ],
+      "brier": 0.1984,
+      "pred_mean": 0.4044
+    },
+    "temporal": {
+      "n_train": 15043,
+      "n_test": 1818,
+      "n_pos_test": 291,
+      "auprc": 0.3135,
+      "auprc_ci95": [
+        0.26925027900072984,
+        0.36505724292228703
+      ],
+      "auroc": 0.7095,
+      "auroc_ci95": [
+        0.679392062321366,
+        0.7402033609343331
+      ],
+      "brier": 0.1987,
+      "pred_mean": 0.4134
+    }
+  },
+  "core_n_features": 53,
+  "core_feature_list": [
+    "anchor_minus_or_start",
+    "anchor_is_intubation",
+    "or_year",
+    "age",
+    "male",
+    "height_cm",
+    "weight_kg",
+    "bmi",
+    "bmi_missing",
+    "sbp_mean",
+    "sbp_min",
+    "sbp_max",
+    "sbp_sd",
+    "sbp_n",
+    "sbp_last",
+    "map_mean",
+    "map_min",
+    "map_max",
+    "map_sd",
+    "map_n",
+    "map_last",
+    "dbp_mean",
+    "dbp_min",
+    "dbp_max",
+    "dbp_sd",
+    "dbp_n",
+    "dbp_last",
+    "hr_mean",
+    "hr_min",
+    "hr_max",
+    "hr_sd",
+    "hr_n",
+    "hr_last",
+    "hrp_mean",
+    "hrp_min",
+    "hrp_max",
+    "hrp_sd",
+    "hrp_n",
+    "hrp_last",
+    "spo2_mean",
+    "spo2_min",
+    "spo2_max",
+    "spo2_sd",
+    "spo2_n",
+    "spo2_last",
+    "map_frac_below_65",
+    "map_frac_below_55",
+    "map_n_below_65",
+    "map_n_below_55",
+    "map_minutes_since_last",
+    "map_slope",
+    "vitals_window_actual_min",
+    "vitals_window_n_records"
+  ],
+  "note": "core_transportable_model 用 VitalDB 可得的特征子集在 MOVER 上重拟合，代表外部验证的诚实预期（VitalDB 还将进一步丢失 anchor_is_intubation/ev_* 等 MOVER 特有时序信号，故外部 AUPRC 可能更低）。"
+}

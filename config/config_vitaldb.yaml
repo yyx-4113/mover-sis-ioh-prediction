@@ -1,0 +1,105 @@
+# 外部验证配置 — VitalDB（方案 A）
+# 与 config.yaml 保持 D1 定义严格一致；仅更改数据源、锚点适配、特征可移植子集。
+# 本配置供 scripts/ext_pipeline.py 使用。
+
+project:
+  name: "SIS术中低血压预测-外部验证(VitalDB)"
+  author: "Yongxin Yang"
+  orcid: "PLACEHOLDER"   # 外部验证脚本不消费；主稿 ORCID 见 config.yaml
+  protocol_version: "ext-v1.0"
+
+paths:
+  workspace_root: "../../"
+  results_dir: "results/ext"      # 外部验证产物独立目录，避免污染主结果
+  review_dir: "review"
+  # VitalDB 本地缓存（VitalFile 默认缓存到 ~/.vitaldb；可在此覆盖）
+  vitaldb_cache: null             # null = 使用包默认缓存
+
+# 数据来源
+external_source:
+  name: "VitalDB"
+  package: "vitaldb"
+  registry_url: "https://vitaldb.net/"
+  requires_account: true
+  # 目标病例筛选（与 config.yaml cohort 对齐）
+  case_filter:
+    min_age: 18
+    has_arterial_map: true        # 需 ART_MAP 轨
+    min_or_window_minutes: 60
+    max_or_window_minutes: 1440
+    min_preanchor_map_records: 1  # 锚点前 15 min 窗口至少 1 次 MAP
+  target_n_cases: 1500            # 建议样本量（与 MOVER 测试集可比）
+
+# 结局定义（与 config.yaml outcomes.definitions.D1 严格一致）
+outcomes:
+  primary_id: "D1"
+  definitions:
+    D1: {type: exposure_fraction, signal: "MAP", threshold: 65, min_measurements: 10, fraction: 0.30}
+
+# 预测窗（锚点适配：VitalDB 无 Intubation 事件，以 operation start 为锚）
+prediction:
+  anchor_event: "operation_start"   # VitalDB opstart；非 MOVER Intubation
+  anchor_fallback: null             # VitalDB 无 Surgery_start 兜底概念
+  early_window_minutes: 15          # 锚点前 15 min 生理作特征
+  outcome_window: "post_anchor"     # [anchor, op_end]
+  # 注：VitalDB MAP 为动脉、密度高；仍用 exposure_fraction 口径保证跨库可比
+
+# 特征工程（仅保留 VitalDB 可移植域；其余剔除并报告为 transportability 局限）
+features:
+  window_minutes: 15
+  outcome_source: "post_anchor"
+  # 可移植核心子集前缀（与 ext_core_benchmark.py KEEP_PREFIX 一致）
+  keep_prefix:
+    - "age"
+    - "male"
+    - "height_cm"
+    - "weight_kg"
+    - "bmi"
+    - "bmi_missing"
+    - "map_"
+    - "sbp_"
+    - "dbp_"
+    - "hr_"
+    - "hrp_"
+    - "spo2_"
+    - "vitals_window_"
+    - "anchor_is_intubation"   # VitalDB 恒为 0，下游剔除
+    - "anchor_minus_or_start"  # VitalDB 重定义为 anchor_minus_case_start
+    - "or_year"                # VitalDB 无年份概念；占位/剔除
+  drop_prefix:
+    - "sg_"
+    - "ev_"
+    - "n_events_pre_anchor"
+    - "art_"
+    - "agent_"
+    - "has_vent"
+    - "has_art_line"
+    - "drug_"
+    - "lab_"
+    - "has_lab"
+    - "io_"
+    - "has_io"
+
+# 建模（与 config.yaml modeling 一致；复现 s3 XGB）
+modeling:
+  seed: 12345
+  cv_folds: 5
+  class_weight: "balanced"
+  calibration: "isotonic_oof"
+  primary_metric: "AUPRC"
+  bootstrap_resamples: 1000
+  xgboost:
+    n_estimators: 300
+    max_depth: 4
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_weight: 10
+    reg_lambda: 1.0
+    eval_metric: "logloss"
+
+# 复现约束：外部验证必须复用 MOVER 拟合管线（s3 不持久化模型）
+reuse:
+  mover_features: "../../results/s2_features.csv"
+  mover_labels: "../../results/s1_labels_postanchor.csv"
+  mover_config: "../config.yaml"
