@@ -33,7 +33,9 @@ intervals were secondary; out-of-fold isotonic calibration and decision curve an
 (0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191
 to 0.119. Performance was higher in women and younger patients; pre-anchor mean MAP was the dominant
 predictor. Externally (VitalDB, prevalence 5.7%), the unchanged model retained discrimination
-(AUROC 0.751, 95% CI 0.713–0.784; AUPRC 0.160, 0.129–0.202) but probabilities were uncalibrated.
+(AUROC 0.751, 95% CI 0.713–0.784; AUPRC 0.160, 0.129–0.202) but probabilities were uncalibrated;
+since the external anchor (operation start) postdates induction, this is a transportability check
+rather than a like-for-like validation.
 
 **Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest
 but non-null discrimination for cumulative hypotension burden and was well calibrated. External
@@ -174,21 +176,29 @@ learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 samples per l
 
 ### External validation cohort
 
-To test generalisability beyond the development site, the MOVER core model was applied unchanged to
-VitalDB [19], an independent public database of high-fidelity vital signs from surgical patients at
-a single tertiary centre (Seoul National University Hospital, Republic of Korea), accessed through
-its public application programming interface without authentication. Because VitalDB records no
-intubation event, the prediction anchor was adapted from the MOVER intubation anchor to the
-operation start time (opstart), the closest available analogue, and the outcome D1 was computed
-identically over the window [opstart, opend]. The external cohort comprised cases with an arterial
-mean arterial pressure track (Solar8000/ART_MBP or EV1000/ART_MBP) and valid opstart/opend times
-(n = 3,735). Predictors were restricted to the 53-feature transportable subset (demographics and
-pre-anchor 15-minute vital-sign statistics) available in both resources; MOVER-specific timing
-signals (anchor is intubation, intubation event recorded) and the calendar-year indicator, which are
-not derivable from VitalDB, were set to zero. The MOVER core model (53 features, seed 12,345) was
-applied without any external refitting or recalibration; performance was summarised by AUPRC
-(primary), AUROC and Brier score, with 95% confidence intervals from 1,000 bootstrap resamples.
-Calibration was assessed descriptively and was not updated on the external data.
+As a transportability check rather than a like-for-like external validation, the MOVER core model was
+applied unchanged to VitalDB [19], an independent public database of high-fidelity vital signs from
+surgical patients at a single tertiary centre (Seoul National University Hospital, Republic of
+Korea), accessed through its public application programming interface without authentication. A
+transparency limitation must be stated at the outset: VitalDB records no intubation event, so the
+prediction anchor was adapted from the MOVER intubation (induction) anchor to the operation start
+time (opstart), which occurs *after* induction and intubation. The external "pre-anchor" 15-minute
+window therefore captures early-intraoperative rather than pre-induction physiology, a different
+phase from the development window. The outcome D1 was computed identically over [opstart, opend]. Of
+6,388 VitalDB cases, 3,735 had both valid opstart/opend times and an arterial mean arterial pressure
+track (Solar8000/ART_MBP or EV1000/ART_MBP) and formed the external cohort. Predictors were
+restricted to the 53-feature transportable subset: demographic and anthropometric variables;
+pre-anchor 15-minute summary statistics of six vital signs (MAP, SBP, DBP, HR, a heart-rate
+variability proxy and SpO₂); the fraction of pre-anchor MAP readings below 65 and 55 mmHg; and three
+MOVER-specific contextual features — the anchor-to-OR-start interval, an indicator that the anchor
+was an intubation event, and a calendar-year indicator. The latter two are not derivable from
+VitalDB and were set to zero; the anchor-to-OR-start interval was re-derived under the opstart anchor
+(opstart minus case start, in minutes), so its meaning necessarily differs from the development
+cohort, where it is the OR-start-to-intubation interval — a residual source of transportability
+error. The MOVER core model (53 features, seed 12,345) was applied without any external refitting or
+recalibration; performance was summarised by AUPRC (primary), AUROC and Brier score, with 95%
+confidence intervals from 1,000 bootstrap resamples. Calibration was assessed descriptively and was
+not updated on the external data.
 
 ### Validation and performance
 
@@ -314,7 +324,7 @@ measurements over the OR window was 33 (5th–95th percentile 12–90).
 | Domain | Predictors | Cases with data | Coverage (%) | Max interval to anchor (min) |
 |---|---|---|---|---|
 | Anchor characteristics | 3 | 16,861 | 100.0 | 0.00 |
-| Demographics | 6 | — | 99.8 | n/a (static) |
+| Demographics | 6 | — | 99.7 | n/a (static) |
 | Surgical group | 14 | 16,861 | 100.0 | n/a (static) |
 | Anaesthesia technique | 12 | 16,563 | 98.2 | 0.00 |
 | Medication (pre-anchor) | 26 | 16,573 | 98.3 | 0.00 |
@@ -364,13 +374,16 @@ recalibration reduced the Brier score to 0.119, with a calibration slope of 0.90
 of 0.008, indicating well-calibrated probabilities on the log-odds scale. On the temporal split the
 Brier score improved from 0.194 to 0.122, with slope 0.934 and intercept 0.006.
 
-In decision curve analysis, the calibrated model's net benefit exceeded that of both default
-strategies (treat all, treat none) across the evaluated threshold range, remaining positive up to a
-threshold of 0.58 on the patient-level split and 0.73 on the temporal split (with a transient dip
-near 0.67 on the temporal split). At a threshold of 0.15, close to the outcome prevalence, net
-benefit was 0.050 and 0.058 respectively; at a threshold of 0.10 it was 0.079 and 0.085. In a
-benchmark against a logistic model using the pre-anchor mean MAP alone, the full model's incremental
-net benefit was 0.013 at both thresholds 0.10 and 0.15 (Figure 4).
+In decision curve analysis, the calibrated model's net benefit exceeded that of the "treat none"
+strategy (and the "treat all" strategy, whose net benefit is strongly negative at these prevalences)
+across the evaluated threshold range, remaining positive up to a threshold of 0.58 on the
+patient-level split and 0.73 on the temporal split, with a transient negative dip on the temporal
+split between roughly 0.59 and 0.66. The absolute net benefit at the decision-relevant thresholds
+was small (e.g., 0.050 and 0.058 at 0.15 on the two splits, and 0.079 and 0.085 at 0.10), so the
+clinical usefulness demonstrated by the curve is modest. At a threshold of 0.15, close to the
+outcome prevalence, net benefit was 0.050 and 0.058 respectively; at a threshold of 0.10 it was
+0.079 and 0.085. In a benchmark against a logistic model using the pre-anchor mean MAP alone, the
+full model's incremental net benefit was 0.013 at both thresholds 0.10 and 0.15 (Figure 4).
 
 ### Subgroup performance
 
@@ -424,16 +437,22 @@ pressure summaries.
 
 ### External validation
 
-The MOVER core model was applied without refitting to the VitalDB arterial cohort of 3,735 cases, of
-which 214 (5.73%) met the D1 outcome (Table 7). Discrimination transferred: the external AUROC was
-0.751 (95% CI 0.713–0.784), numerically above the internal patient-level value of 0.698 and the
-temporal value of 0.710 for the same 53-feature model, and the external AUPRC of 0.160
-(0.129–0.202) exceeded the external prevalence by a factor of 2.8, a larger relative lift than the
-2.1-fold internal value for that model. The lower absolute AUPRC reflects the much lower external
-prevalence (5.73% vs 15.55%) rather than a loss of ranking ability. Absolute probabilities did not
-transfer: the mean predicted risk was 0.37 against an observed prevalence of 0.057 (external Brier
-score 0.179), indicating that the model would require local recalibration before the predicted
-probabilities could be used directly. These results are summarised in Figure 6 and Table 7.
+The MOVER core model was applied without refitting to the VitalDB arterial cohort of 3,735 eligible
+cases (of 6,388 VitalDB cases with recorded vital signs, those with valid operation timing and an
+arterial MAP track), of which 214 (5.73%) met the D1 outcome (Table 7); a further 214 cases with
+fewer than 10 post-anchor MAP measurements were classified D1-negative by construction under the
+same rule as the development cohort, so the conditional prevalence among adequately monitored
+external cases was 6.1% (214 of 3,521). Discrimination transferred: the external AUROC was 0.751
+(95% CI 0.713–0.784), numerically above the internal patient-level value of 0.698 and the temporal
+value of 0.710 for the same 53-feature model, although the confidence intervals overlap
+(0.713–0.784 vs 0.673–0.723 and 0.679–0.740), so the difference should be read as consistency
+rather than superiority. The external AUPRC of 0.160 (0.129–0.202) exceeded the external prevalence
+by a factor of 2.8, a larger relative lift than the 2.1-fold internal value for that model. The
+lower absolute AUPRC reflects the much lower external prevalence (5.73% vs 15.55%) rather than a
+loss of ranking ability. Absolute probabilities did not transfer: the mean predicted risk was 0.37
+against an observed prevalence of 0.057 (external Brier score 0.179), indicating that the model
+would require local recalibration before the predicted probabilities could be used directly. These
+results are summarised in Figure 6 and Table 7.
 
 **Table 7. External validation of the MOVER core model (53 features) in VitalDB versus internal
 performance of the same model in MOVER/SIS.**
@@ -531,16 +550,26 @@ signals, rather than in revealing hidden physiology.
 
 ### Limitations
 
-1. **External validation was performed with necessary adaptations and shows transfer of
-   discrimination but not of calibration.** The model was validated externally in VitalDB without
-   refitting or recalibrating; the anchor was adapted from intubation to operation start (VitalDB
-   records no intubation event) and MOVER-specific timing signals were set to zero. The external
-   cohort had a substantially lower outcome prevalence (5.73% vs 15.55%) and a different
-   recording architecture (continuous arterial pressure rather than intermittent non-invasive
-   measurement), so the external AUPRC cannot be compared directly with the internal value; the
-   external AUROC (0.751) indicates that ranking transferred. Predicted probabilities were not
-   calibrated to the external cohort (mean predicted risk 0.37 vs observed 0.057), so the external
-   result supports deployment readiness of the *discrimination* but not of the *probabilities*.
+1. **External validation was performed as a transportability check with necessary adaptations and
+   shows transfer of discrimination but not of calibration.** The model was validated externally in
+   VitalDB without refitting or recalibrating, but three adaptations limit how the result should be
+   read. First, because VitalDB records no intubation event, the anchor was adapted from induction
+   (intubation) to operation start (opstart), which occurs after induction; the external pre-anchor
+   window therefore captures early-intraoperative rather than pre-induction physiology, a different
+   phase from the development window. Second, the one MOVER-specific timing feature that could be
+   re-derived under the opstart anchor — the interval from operation start to the prediction anchor —
+   necessarily changes meaning between cohorts (OR-start-to-intubation in MOVER, case-start-to
+   -operation-start in VitalDB) and is a residual source of transportability error. Third, the
+   external cohort was restricted to 3,735 of 6,388 VitalDB cases with valid operation timing and an
+   arterial MAP track, introducing selection we could not characterise fully, and a further 214
+   external cases were classified D1-negative by construction for having fewer than 10 post-anchor
+   MAP measurements. The external cohort also had a substantially lower outcome prevalence (5.73% vs
+   15.55%) and a different recording architecture (continuous arterial pressure rather than
+   intermittent non-invasive measurement), so the external AUPRC cannot be compared directly with the
+   internal value; the external AUROC (0.751) indicates that ranking transferred, although its
+   confidence interval overlaps the internal interval. Predicted probabilities were not calibrated to
+   the external cohort (mean predicted risk 0.37 vs observed 0.057), so the external result supports
+   deployment readiness of the *discrimination* but not of the *probabilities*.
 2. **Severe sparsity of non-invasive blood pressure.** Median 3 readings in the 15-minute
    pre-anchor window; 96.2% of recording segments are single minutes. This caps achievable
    performance and makes any sustained-duration definition effectively unmeasurable.
@@ -652,7 +681,7 @@ which is available to qualified researchers upon signature of a data use agreeme
 Patient-level data are not redistributed by the author, as the data use agreement does not permit
 this. All analysis code, the configuration file, the audit trail, and the aggregate result files
 from which every number in this manuscript is generated are available at
-https://github.com/yyx-4113/mover-sis-ioh-prediction (v1.0.0 reproduction package), together with a manifest of
+https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.0 (v1.0.0 reproduction package), together with a manifest of
 file checksums (MANIFEST.csv). Patient-level derived files (per-case feature matrix and outcome
 labels) are regenerable from the MOVER source under the data use agreement by running the provided
 pipeline (scripts/run_all.py).
@@ -723,7 +752,7 @@ an author.
     surgery. BMC Anesthesiol. 2026;26:334. doi:10.1186/s12871-026-03841-9.
 16. Walsh M, Devereaux PJ, Garg AX, et al. Relationship between intraoperative mean arterial
     pressure and clinical outcomes after noncardiac surgery: toward an empirical definition of
-    hypotension. Anesthesiology. 2013;119(3):507–515.
+    hypotension. Anesthesiology. 2013;119(3):507–515. doi:10.1097/ALN.0b013e3182a10e26.
 17. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
 18. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
 19. Lee S, Park J, Lee S, Park Y, Kim S, Kim T, et al. VitalDB, a high-fidelity vital signs database in surgical patients. Sci Data. 2022;9:279. doi:10.1038/s41597-022-01794-9.
