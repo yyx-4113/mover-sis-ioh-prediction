@@ -1,4 +1,4 @@
-# Prediction of sustained intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with external validation in VitalDB
+# Prediction of cumulative intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with external validation in VitalDB
 
 **Yongxin Yang**¹  ORCID 0009-0004-9698-6552
 
@@ -34,13 +34,14 @@ intervals were secondary; out-of-fold isotonic calibration and decision curve an
 to 0.119. Performance was higher in women and younger patients; pre-anchor mean MAP was the dominant
 predictor. Externally (VitalDB, prevalence 5.7%), the unchanged model retained discrimination
 (AUROC 0.751, 95% CI 0.713–0.784; AUPRC 0.160, 0.129–0.202) but probabilities were uncalibrated;
-since the external anchor (operation start) postdates induction, this is a transportability check
-rather than a like-for-like validation.
+for the 53-feature model internal AUROC was 0.698–0.710, and because the external anchor
+(operation start) postdates induction, this is a transportability check, not a like-for-like
+validation.
 
 **Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest
 but non-null discrimination for cumulative hypotension burden and was well calibrated. External
-validation confirmed transfer of discrimination but not of absolute probabilities, which would
-require local recalibration before clinical use.
+validation confirmed transfer of discrimination but not of absolute probabilities, requiring
+local recalibration before clinical use.
 
 **Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean
 arterial pressure; perioperative medicine; calibration; TRIPOD
@@ -54,10 +55,10 @@ colleagues showed that MAP below an absolute threshold of 65 mmHg was progressiv
 both myocardial and kidney injury after non-cardiac surgery, that prolonged exposure increased
 the odds at any given threshold, and that absolute thresholds discriminated as well as relative
 thresholds derived from preoperative pressure [1]. These conclusions have since been reinforced
-by a systematic review of intraoperative hypotension and adverse postoperative outcomes [17] and
+by a systematic review of intraoperative hypotension and adverse postoperative outcomes [16] and
 by a perioperative consensus that recommends keeping intraoperative mean arterial pressure at or
-above 60 mmHg in at-risk patients [18], and by further work linking intraoperative mean arterial
-pressure to outcomes [16]. These findings shifted attention from the
+above 60 mmHg in at-risk patients [17], and by further work linking intraoperative mean arterial
+pressure to outcomes [15]. These findings shifted attention from the
 lowest recorded value towards the *cumulative burden* of hypotensive exposure.
 
 That shift created a demand for anticipation. Commercial indices derived from arterial waveforms,
@@ -123,14 +124,15 @@ median duration of 147 minutes (5th–95th percentile 49–440).
 
 ### Outcome
 
-The primary outcome (D1) was a cumulative-burden definition aligned with the absolute-threshold
-framework of Salmasi et al. [1]: at least 10 MAP measurements after the anchor, of which at least
-30% were below 65 mmHg. Cases with fewer than 10 post-anchor measurements were classified as
+The primary outcome (D1) was a cumulative-burden definition that adopts the absolute MAP
+threshold (<65 mmHg) of Salmasi et al. [1] but operationalises burden as at least 10 MAP
+measurements after the anchor, of which at least 30% were below threshold; the ≥10-measurement and
+≥30%-below rule is our operational choice rather than a literal transcription of that report. Cases with fewer than 10 post-anchor measurements were classified as
 negative by construction; this applied to 1,496 cases (8.9%), because the definition deliberately
 requires a minimum amount of evidence before a burden can be asserted.
 
 Because the choice of hypotension definition materially changes apparent performance, 14 candidate
-definitions were computed for every case and are reported in full (Table 2) [9]. They comprise
+definitions were computed for every case and are reported in full (Table 2; their prevalence is shown in Figure 2). They comprise
 sustained-grid definitions (consecutive minutes below threshold on a one-minute grid, with missing
 minutes counted as interruption), point-burst definitions (a minimum number of low readings within
 a rolling window), exposure-fraction definitions, any-below definitions, two SpO₂ desaturation
@@ -177,7 +179,7 @@ learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 samples per l
 ### External validation cohort
 
 As a transportability check rather than a like-for-like external validation, the MOVER core model was
-applied unchanged to VitalDB [19], an independent public database of high-fidelity vital signs from
+applied unchanged to VitalDB [18], an independent public database of high-fidelity vital signs from
 surgical patients at a single tertiary centre (Seoul National University Hospital, Republic of
 Korea), accessed through its public application programming interface without authentication. A
 transparency limitation must be stated at the outset: VitalDB records no intubation event, so the
@@ -345,7 +347,7 @@ On the primary patient-level split, XGBoost gave the highest AUPRC at 0.347 (95%
 which is 2.23 times the prevalence of 0.1555 expected under no skill (Table 4). LightGBM was
 similar on AUROC (0.724 vs 0.722) but slightly lower on AUPRC. The full logistic model reached
 AUPRC 0.301, and the age/sex/BMI baseline 0.234, indicating that the additional predictors
-contribute meaningfully beyond basic demographics while the absolute gain remains moderate.
+contribute meaningfully beyond basic demographics while the absolute gain remains moderate. Figure 3 shows the precision–recall and receiver operating characteristic curves for all four models.
 
 Results on the temporal split were closely similar (XGBoost AUPRC 0.339, AUROC 0.733), indicating
 no material calendar-time drift.
@@ -375,10 +377,12 @@ of 0.008, indicating well-calibrated probabilities on the log-odds scale. On the
 Brier score improved from 0.194 to 0.122, with slope 0.934 and intercept 0.006.
 
 In decision curve analysis, the calibrated model's net benefit exceeded that of the "treat none"
-strategy (and the "treat all" strategy, whose net benefit is strongly negative at these prevalences)
-across the evaluated threshold range, remaining positive up to a threshold of 0.58 on the
-patient-level split and 0.73 on the temporal split, with a transient negative dip on the temporal
-split between roughly 0.59 and 0.66. The absolute net benefit at the decision-relevant thresholds
+strategy at low-to-moderate thresholds, remaining positive up to approximately 0.58 on the
+patient-level split and 0.46 on the temporal split; on the temporal split it then became negative
+between roughly 0.46 and 0.66 and returned briefly to positive only between approximately 0.66 and
+0.74 before turning negative again. The "treat all" strategy had a small positive net benefit at the
+lowest evaluated thresholds (≈0.06 at threshold 0.10) but became strongly negative at higher
+thresholds (≈−2.1 at 0.73), so it offers no advantage over the model. The absolute net benefit at the decision-relevant thresholds
 was small (e.g., 0.050 and 0.058 at 0.15 on the two splits, and 0.079 and 0.085 at 0.10), so the
 clinical usefulness demonstrated by the curve is modest. At a threshold of 0.15, close to the
 outcome prevalence, net benefit was 0.050 and 0.058 respectively; at a threshold of 0.10 it was
@@ -418,7 +422,7 @@ Pre-anchor arterial pressure dominated (Table 6). Mean MAP had a gain roughly 2.
 next predictor. The remaining informative predictors were the maximum pre-anchor MAP, whether the
 anchor was an intubation event, the elapsed time from OR start to the anchor, the fraction of
 pre-anchor readings already below 65 mmHg, surgical group, and diastolic and invasive arterial
-pressure summaries.
+pressure summaries. Figure 5 shows the 25 highest-gain predictors.
 
 **Table 6. Ten highest-gain predictors, XGBoost (patient-level split).**
 
@@ -477,8 +481,9 @@ cumulative burden of hypotension over the remainder of surgery, with closely sim
 under temporal validation and good calibration after isotonic recalibration. Discrimination was
 therefore approximately 2.2-fold (2.23×) better than the no-skill baseline on the precision–recall
 scale — modest, but clearly not null — and the decision curve showed the model yielded positive net
-benefit relative to both default strategies across threshold probabilities up to 0.58
-(patient-level) and 0.73 (temporal). The decision-relevant region is therefore thresholds near to
+benefit relative to both default strategies across threshold probabilities up to approximately 0.58
+(patient-level) and 0.46 (temporal); on the temporal split the net benefit turns negative beyond
+0.46 except for a narrow positive interval near 0.66–0.74. The decision-relevant region is therefore thresholds near to
 moderately above the outcome prevalence (roughly 0.10–0.30), where the calibrated probabilities
 could support a vasopressor-readiness or enhanced-monitoring decision; the specific operating point
 remains a clinical judgement to be informed by external validation rather than settled here.
@@ -511,18 +516,18 @@ non-invasive arterial pressure is recorded in fewer than one in five case-minute
 recorded segments are isolated single minutes, so the physiological trajectory available to any
 model is extremely coarse. Second, an independent external evaluation on the same resource reported
 an AUROC of 0.696 for a deliberately simple three-variable additive model under a
-selection-bias-resistant protocol [13], and a cross-centre evaluation attributed inflated
+selection-bias-resistant protocol [12], and a cross-centre evaluation attributed inflated
 performance to selection effects rather than to genuine generalisability [5]; our AUROC of 0.722
 is consistent in magnitude with the former. We note that the same external analysis reported that
 the *dynamics* of arterial pressure, not only its current value, carry incremental predictive
-information for hypotension [13]. Our recording density (median 3 MAP readings in the 15-minute
+information for hypotension [12]. Our recording density (median 3 MAP readings in the 15-minute
 pre-anchor window) is too sparse to characterise such dynamics, so our model necessarily leans on
 the static pre-anchor level; this is a limitation of the source data rather than evidence against
 the dynamics signal. Other investigators have developed machine-learning models for intraoperative
 risk from comparable operating-room resources, including external-validation studies [14,15]. We now
 provide such an external validation ourselves, in VitalDB, an independent resource with a different
-recording architecture; the model's ranking ability transferred (external AUROC 0.751, above the
-internal 0.698–0.710 for the same 53-feature model) while absolute probabilities did not and would
+recording architecture; the model's ranking ability transferred (external AUROC 0.751, in the same range as
+and overlapping the confidence interval of the internal 0.698–0.710 for the same 53-feature model) while absolute probabilities did not and would
 require local recalibration — a finding that strengthens rather than weakens the caution above.
 Performance of the order of 0.97 would still require near-separation of the classes, which is
 difficult to reconcile with the recording density reported here, and we flag the possibility of
@@ -597,7 +602,8 @@ signals, rather than in revealing hidden physiology.
    values to missing.
 8. **Single author, no preregistration.** The analysis protocol was fixed before modelling but was
    not publicly registered. Predictor importance is descriptive and should not be read as inference.
-9. **The model largely reflects the present blood pressure.** The dominant predictor is the
+9. **Outcome-label validity under sparse sampling.** D1 is an exposure-fraction definition that treats each recorded MAP as representative of the true intraoperative pressure; under the observed 19.89% recording density, with 96.2% of non-null segments consisting of isolated single minutes, recorded MAP is not a random sample of the surgical period. Cases monitored only during stable intervals could be under-counted as burden-free, so the reported prevalence and performance may be sensitive to which minutes were recorded. We state this as a structural limitation of deriving burden from intermittent non-invasive measurement rather than continuous arterial pressure.
+10. **External discrimination may be inflated by recording density.** VitalDB records continuous arterial pressure, which both defines the outcome and supplies the MAP predictors far more densely and cleanly than the intermittent non-invasive measurement in MOVER/SIS; blood-pressure autocorrelation under dense sampling can inflate apparent ranking discrimination relative to the development cohort. The external AUROC of 0.751 should therefore be read as evidence that ranking transferred under a denser measurement regime, not as evidence of intrinsically better discrimination than the development cohort.
    pre-anchor MAP level, and the next strongest predictors are the maximum pre-anchor MAP and the
    fraction of pre-anchor readings already below 65 mmHg. The model therefore largely extrapolates
    the patient's current pressure rather than discovering independent risk, and adds limited
@@ -631,9 +637,9 @@ in perioperative hypotension prediction and that hold independently of the discr
    rather than a discovery of new physiology, and supplies future work with a realistic baseline on
    this resource.
 5. **An honest external validation on an independent resource.** In VitalDB the model was applied
-   unchanged; discrimination transferred (AUROC 0.751, exceeding the internal 0.698–0.710 for the
-   same feature set) while calibration did not, isolating exactly what does and does not generalise
-   and supplying a concrete deployment requirement (local recalibration) rather than an abstract
+   unchanged; discrimination transferred (AUROC 0.751, in the same range as and overlapping the
+   confidence interval of the internal 0.698–0.710 for the same feature set) while calibration did not, isolating exactly what does and does not generalise
+   and supplying a concrete deployment requirement (local recalibration on the deployment cohort's own anchor and recording regime) rather than an abstract
    "needs external validation" caveat.
 
 ## Conclusions
@@ -642,11 +648,12 @@ Using only data available at the anaesthesia induction anchor, a gradient-booste
 modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for cumulative intraoperative
 hypotension burden, reproduced under temporal validation and well calibrated after isotonic
 recalibration. In an independent external cohort (VitalDB, n = 3,735) the same model retained
-discrimination (AUROC 0.751) without refitting, although absolute probabilities were not calibrated
-to that cohort and would require local updating. Most of the predictive information resided in the
+discrimination (AUROC 0.751) without refitting — a transportability check rather than a like-for-like
+validation, because the external anchor (operation start) postdates induction — although absolute
+probabilities were not calibrated to that cohort and would require local updating. Most of the predictive information resided in the
 pre-anchor arterial pressure level, suggesting that such models primarily identify patients who are
 already relatively hypotensive at induction rather than anticipating new events. We recommend that
-future work on this and similar resources prioritise local recalibration at deployment, explicit
+future work on this and similar resources prioritise local recalibration on the deployment cohort's own anchor and recording regime, explicit
 reporting of the outcome definition and its prevalence, and routine quantification of recording
 density, and that claims of near-perfect discrimination on sparse non-invasive data be treated with
 corresponding caution.
@@ -733,29 +740,28 @@ an author.
    2024;385:e078378. doi:10.1136/bmj-2023-078378.
 8. MOVER (Medical Informatics Operating Room Vitals and Events Repository). UCI Machine Learning
    Repository. doi:10.24432/C5VS5G.
-9. This manuscript, Table 2 (all 14 definitions computed for every case; see Additional file 1).
-10. Pedregosa F, Varoquaux G, Gramfort A, et al. Scikit-learn: machine learning in Python. J Mach
+9. Pedregosa F, Varoquaux G, Gramfort A, et al. Scikit-learn: machine learning in Python. J Mach
     Learn Res. 2011;12:2825–2830.
-11. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. In: Proceedings of the 22nd ACM
+10. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. In: Proceedings of the 22nd ACM
     SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016:785–794.
     doi:10.1145/2939672.2939785.
-12. Ke G, Meng Q, Finley T, et al. LightGBM: a highly efficient gradient boosting decision tree.
+11. Ke G, Meng Q, Finley T, et al. LightGBM: a highly efficient gradient boosting decision tree.
     In: Advances in Neural Information Processing Systems 30. 2017:3146–3154.
-13. Oyarzun R. The dynamics of arterial pressure itself predict intraoperative hypotension beyond
+12. Oyarzun R. The dynamics of arterial pressure itself predict intraoperative hypotension beyond
     its current value: an interpretable additive model validated in 3,069 external patients under a
     selection-bias-resistant protocol. medRxiv. 2026. doi:10.1101/2026.08.26.26361468.
-14. Chiu C, Braehler MR, Donovan AL, Butte AJ, Pirracchio R, Bishara AM. Development of a machine
+13. Chiu C, Braehler MR, Donovan AL, Butte AJ, Pirracchio R, Bishara AM. Development of a machine
     learning-derived model to predict unplanned ICU admissions after major non-cardiac surgery.
     BMC Anesthesiol. 2025;25:351. doi:10.1186/s12871-025-03195-8.
-15. Cheun H, Ahn JH, Park JW, et al. Development and external validation of a machine learning
+14. Cheun H, Ahn JH, Park JW, et al. Development and external validation of a machine learning
     model for predicting severe immediate postoperative complications in adults undergoing cardiac
     surgery. BMC Anesthesiol. 2026;26:334. doi:10.1186/s12871-026-03841-9.
-16. Walsh M, Devereaux PJ, Garg AX, et al. Relationship between intraoperative mean arterial
+15. Walsh M, Devereaux PJ, Garg AX, et al. Relationship between intraoperative mean arterial
     pressure and clinical outcomes after noncardiac surgery: toward an empirical definition of
     hypotension. Anesthesiology. 2013;119(3):507–515. doi:10.1097/ALN.0b013e3182a10e26.
-17. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
-18. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
-19. Lee S, Park J, Lee S, Park Y, Kim S, Kim T, et al. VitalDB, a high-fidelity vital signs database in surgical patients. Sci Data. 2022;9:279. doi:10.1038/s41597-022-01794-9.
+16. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
+17. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
+18. Lee HC, Park Y, Yoon SB, Yang SM, Park D, Jung CW. VitalDB, a high-fidelity multi-parameter vital signs database in surgical patients. Sci Data. 2022 Jun 8;9(1):279. doi:10.1038/s41597-022-01411-5. PMID: 35676300; PMCID: PMC9178032.
 
 ## Figure legends
 

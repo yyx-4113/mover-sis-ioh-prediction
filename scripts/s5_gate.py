@@ -68,7 +68,12 @@ for ln in lines:
         ref_block += "\n" + ln
 ref_nums = re.findall(r"(?m)^\s*(\d+)\.\s", ref_block)
 ref_count = len(set(ref_nums))
-add("References count == 19", ref_count == 19, "%d references found" % ref_count)
+add("References count == 18", ref_count == 18, "%d references found" % ref_count)
+# contiguity: reference numbers must be 1..N with no gaps
+ref_nums_int = sorted(int(x) for x in set(ref_nums))
+contiguous = ref_nums_int == list(range(1, len(ref_nums_int) + 1))
+add("References numbered contiguously 1..N", contiguous,
+    "1..%d" % len(ref_nums_int) if contiguous else "gaps: %s" % ref_nums_int)
 
 # ---- docx structure ---------------------------------------------------------
 doc = Document(DOCX)
@@ -110,6 +115,13 @@ for split in ("patient", "temporal"):
     dca_detail.append("%s @%.2f=%.3f vs ms %.3f (Δ%.4f)" %
                       (split, t, nb, manuscript_nb[split], diff))
 add("DCA net benefit @0.15 matches s3", dca_ok, "; ".join(dca_detail))
+
+# regression guard: temporal DCA must be negative in mid-range (≈0.50), not "positive up to 0.73"
+t50_th, t50_nb = nb_at_threshold("temporal", 0.50)
+p50_th, p50_nb = nb_at_threshold("patient", 0.50)
+dca_sign_ok = (t50_nb < 0) and (p50_nb > 0)
+add("DCA sign guard (temporal<0 @0.50, patient>0 @0.50)", dca_sign_ok,
+    "temporal@0.50=%.4f, patient@0.50=%.4f" % (t50_nb, p50_nb))
 
 # ---- report ----------------------------------------------------------------
 report = ["# Quality gate report — %s" % "2026-10-20", ""]
