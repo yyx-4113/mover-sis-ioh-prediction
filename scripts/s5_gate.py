@@ -112,6 +112,24 @@ ext_ok = ("External transportability check" in md) and all(
 add("External transportability block present (3,735 / 6,388 / 214)", ext_ok,
     "present" if ext_ok else "missing external tokens")
 
+# ---- external metrics DERIVED from results/ext/external_validation.json ------
+# Guards the values that previously drifted (Brier 0.179 -> 0.176, pred_mean 0.37 -> 0.36).
+ev = json.load(open(os.path.join(ROOT, "results", "ext", "external_validation.json"),
+                   encoding="utf-8"))
+ext_tokens = [
+    ("AUROC", "%.3f" % ev["auroc"]),
+    ("AUPRC", "%.3f" % ev["auprc"]),
+    ("Brier", "%.3f" % ev["brier"]),
+    ("pred_mean", "%.2f" % ev["pred_mean"]),
+    ("prevalence", "%.3f" % ev["prevalence_D1"]),
+    ("n", "{:,}".format(ev["n_cases"])),
+    ("events", str(ev["n_d1_positive"])),
+]
+ext_miss = ["%s=%s" % (k, v) for k, v in ext_tokens if v not in md]
+add("External metrics match external_validation.json (derived)", len(ext_miss) == 0,
+    "all %d present (%s)" % (len(ext_tokens), ", ".join("%s %s" % kv for kv in ext_tokens))
+    if not ext_miss else "MISSING in ms: " + ", ".join(ext_miss))
+
 # ---- model performance numbers DERIVED from s3_metrics.json ----------------
 m = json.load(open(os.path.join(ROOT, "results", "s3_metrics.json"), encoding="utf-8"))
 expected = []

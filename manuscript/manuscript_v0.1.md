@@ -70,7 +70,9 @@ honest account of what the recording density of the source data permits.
 ### Study design and data source
 
 This is a retrospective cohort study reported in accordance with TRIPOD+AI [7]; it corresponds to
-TRIPOD type 2b (development with internal and external validation). The development data source was
+TRIPOD type 2b (development with internal and external validation), with the qualification that the
+external step is a transportability check rather than a like-for-like validation, because the external
+anchor, endpoint definition and recording density differ from the development cohort. The development data source was
 MOVER (Medical Informatics Operating Room Vitals and Events Repository), University of California
 Irvine, distributed through the UCI Machine Learning Repository [8]. The extraction analysed here
 is the surgical information system (SIS) component, comprising nine linked tables: patient
@@ -474,8 +476,8 @@ value of 0.710 for the same 53-feature model, although the confidence intervals 
 rather than superiority. The external AUPRC of 0.158 (0.126–0.202) exceeded the external prevalence
 by a factor of 2.8, a larger relative lift than the 2.1-fold internal value for that model. The
 lower absolute AUPRC reflects the much lower external prevalence (5.73% vs 15.55%) rather than a
-loss of ranking ability. Absolute probabilities did not transfer: the mean predicted risk was 0.37
-against an observed prevalence of 0.057 (external Brier score 0.179), indicating that the model
+loss of ranking ability. Absolute probabilities did not transfer: the mean predicted risk was 0.36
+against an observed prevalence of 0.057 (external Brier score 0.176), indicating that the model
 would require local recalibration before the predicted probabilities could be used directly. These
 results are summarised in Figure 6 and Table 7.
 
@@ -486,7 +488,7 @@ internal performance of the same model in MOVER/SIS.**
 |---|---|---|---|---|---|---|---|
 | MOVER/SIS (development) | Patient | 3,373 | 525 | 15.55 | 0.321 (0.284–0.362) | 0.698 (0.673–0.723) | 0.198 |
 | MOVER/SIS (development) | Temporal | 1,818 | 291 | 16.01 | 0.314 (0.269–0.365) | 0.710 (0.679–0.740) | 0.199 |
-| VitalDB (external) | — | 3,735 | 214 | 5.73 | 0.158 (0.126–0.202) | 0.744 (0.705–0.778) | 0.179 |
+| VitalDB (external) | — | 3,735 | 214 | 5.73 | 0.158 (0.126–0.202) | 0.744 (0.705–0.778) | 0.176 |
 
 Internal values are for the identical 53-feature transportable model; the development manuscript
 headline (AUPRC 0.347, AUROC 0.722) is for the full 206-feature model. The external cohort had no
@@ -629,7 +631,7 @@ signals, rather than in revealing hidden physiology.
    intermittent non-invasive measurement), so the external AUPRC cannot be compared directly with the
    internal value; the external AUROC (0.744) indicates that ranking transferred, although its
    confidence interval overlaps the internal interval. Predicted probabilities were not calibrated to
-   the external cohort (mean predicted risk 0.37 vs observed 0.057), so the external result supports
+   the external cohort (mean predicted risk 0.36 vs observed 0.057), so the external result supports
    deployment readiness of the *discrimination* but not of the *probabilities*.
 2. **Severe sparsity of non-invasive blood pressure.** Median 3 readings in the 15-minute
    pre-anchor window; 96.2% of recording segments are single minutes. This caps achievable

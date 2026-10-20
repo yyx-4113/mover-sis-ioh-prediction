@@ -3,7 +3,7 @@
 | Check | Status | Detail |
 |---|---|---|
 | Abstract word count <= 350 | **PASS** | 326 words (limit 350) |
-| Total word count reported | **PASS** | 10255 words |
+| Total word count reported | **PASS** | 10285 words |
 | References count == 21 | **PASS** | 21 references found |
 | References numbered contiguously 1..N | **PASS** | 1..21 |
 | docx embeds 6 figures | **PASS** | 6 images |
@@ -11,6 +11,7 @@
 | No leftover placeholders | **PASS** | clean |
 | Anchor ratio present (82.0 / 18.0; 13,834 / 3,027) | **PASS** | all tokens present |
 | External transportability block present (3,735 / 6,388 / 214) | **PASS** | present |
+| External metrics match external_validation.json (derived) | **PASS** | all 7 present (AUROC 0.744, AUPRC 0.158, Brier 0.176, pred_mean 0.36, prevalence 0.057, n 3,735, events 214) |
 | Model AUPRC/AUROC match s3_metrics (derived) | **PASS** | all 16 present |
 | DCA net benefit @0.15 matches s3 (derived) | **PASS** | patient @0.15=0.051 -> '0.051' OK; temporal @0.15=0.058 -> '0.058' OK |
 | DCA sign guard (temporal<0 @0.50, patient>0 @0.50) | **PASS** | temporal@0.50=-0.0017, patient@0.50=0.0042 |
@@ -20,5 +21,5 @@
 ## Overall: **PASS**
 
 Abstract words: 326 / 350
-Total words: 10255
+Total words: 10285
 docx images: 6, tables: 8, references: 21

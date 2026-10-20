@@ -16,7 +16,7 @@ MCOLOR = {"baseline_logit": "#9467bd", "logistic_full": "#8c564b",
 
 def save(fig, name):
     p = os.path.join(FIG, name)
-    fig.savefig(p, dpi=130, bbox_inches="tight")
+    fig.savefig(p, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print("  wrote", p)
 

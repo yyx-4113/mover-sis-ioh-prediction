@@ -285,7 +285,7 @@ def _figures(y, p):
     ax[2].hist(p[y == 0], bins=40, alpha=0.6, label="D1-"); ax[2].hist(p[y == 1], bins=40, alpha=0.6, label="D1+")
     ax[2].set_title("Predicted risk"); ax[2].set_xlabel("P(D1+)"); ax[2].legend()
     fig.tight_layout()
-    fig.savefig(os.path.join(RES, "external_validation_fig.png"), dpi=130)
+    fig.savefig(os.path.join(RES, "external_validation_fig.png"), dpi=300)
     print("[apply] figure -> external_validation_fig.png")
 
 
