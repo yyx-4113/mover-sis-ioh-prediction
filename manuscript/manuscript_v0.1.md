@@ -506,7 +506,7 @@ signals, rather than in revealing hidden physiology.
    measurements and were classified as negative by construction. This is a spectrum effect: the
    excluded cases are exactly those with the sparsest monitoring (typically shorter or less-invasive
    cases) and are therefore not missing at random. The conditional prevalence among cases with at
-   least 10 measurements was 17.5% (2,622 of 14,965), and excluding the sparse-monitoring cases may
+   least 10 measurements was 17.1% (2,622 of 15,365), and excluding the sparse-monitoring cases may
    attenuate apparent performance. Anthropometric cleaning set 37 heights, 18 weights and 6 BMI
    values to missing.
 8. **Single author, no preregistration.** The analysis protocol was fixed before modelling but was

@@ -81,7 +81,7 @@ add("docx has 6 tables", n_tables == 6, "%d tables" % n_tables)
 key_numbers = ["0.347", "0.722", "0.234", "0.301", "0.337", "0.339", "0.733",
                "0.1555", "2,622", "16,861", "13,834", "3,027",
                "175.5", "75.2", "72.2", "69.1", "64.1", "52.9",
-               "0.909", "0.008", "0.119", "0.191", "2.23", "82.1", "17.9"]
+               "0.909", "0.008", "0.119", "0.191", "2.23", "82.1", "17.9", "15,365"]
 missing = [k for k in key_numbers if k not in md]
 add("Key headline numbers present", len(missing) == 0,
     "all %d present" % len(key_numbers) if not missing else "MISSING: " + ", ".join(missing))

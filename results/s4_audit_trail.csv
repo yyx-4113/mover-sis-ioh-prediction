@@ -126,7 +126,8 @@ density.nmap_segments_total,637188,results/s1_data_quality.json,python scripts/s
 density.nmap_segment_length1_share_pct,96.18,results/s1_data_quality.json,python scripts/s1_cohort.py
 density.nmap_per_case_median,33.0,results/s1_data_quality.json,python scripts/s1_cohort.py
 outcome.D1.n_cases_lt10_postanchor_map,1496,results/s1_data_quality.json + results/s1_cohort.json,python scripts/s1_cohort.py
-outcome.D1.conditional_prevalence_ge10meas,1.7527,results/s1_outcomes_postanchor.json + results/s1_data_quality.json,python scripts/s1_cohort.py
+outcome.D1.conditional_prevalence_ge10meas,0.1706,results/s1_outcomes_postanchor.json + results/s1_data_quality.json,python scripts/s1_cohort.py
+outcome.D1.n_eligible_ge10_postanchor_map,15365,results/s1_data_quality.json,python scripts/s1_cohort.py
 coverage.case_count.anchor,16861,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
 coverage.case_count.demographics,n/a (static),results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
 coverage.case_count.surgery,16861,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py

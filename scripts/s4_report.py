@@ -211,8 +211,8 @@ TRIPOD = """# TRIPOD+AI (2024) 清单 — 01 SIS 术中低血压预测
 
 | # | TRIPOD+AI 条目 | 状态 | 位置 / 证据 |
 |---|---|---|---|
-| 1 | **Title**：明确为预测模型研究（含 ML） | ⏳ | 稿件标题待定稿（protocol §1） |
-| 2 | **Abstract**：结构化，含数据来源、模型、性能 | ⏳ | 待撰稿 |
+| 1 | **Title**：明确为预测模型研究（含 ML） | ✅ | manuscript_v0.1.md 标题 |
+| 2 | **Abstract**：结构化，含数据来源、模型、性能 | ✅ | 已完成（结构化摘要，350 词内） |
 | 3 | **Objectives**：明确临床问题与预测目标 | ✅ | protocol §1；锚点后 IOH |
 | 4 | **Data sources**：数据来源、时间跨度、检索方式 | ✅ | `s1_cohort.json`；SIS EMR 九表，2015-11~2018-10 |
 | 5 | **Eligibility**：纳入排除标准 | ✅ | protocol §2；`s1_cohort.json`（瀑布各项和自洽） |
@@ -234,13 +234,16 @@ TRIPOD = """# TRIPOD+AI (2024) 清单 — 01 SIS 术中低血压预测
 | 21 | **Ethics / IRB**：伦理审批与知情同意 | ⚠️ | 回顾性去标识数据；**须由作者确认本单位伦理审批状态** |
 | 22 | **Data availability**：数据与代码可获取 | ⚠️ | 产物齐备；**须落实公开仓库/DOI**（禁写 "available on request"） |
 | 23 | **Funding / COI** | ⏳ | 待作者补充 |
-| 24 | **Registration**：研究是否预注册 | ⚠️ | protocol 已版本化（v0.2-draft）；建议投稿前补注册号 |
+| 24 | **Registration**：研究是否预注册 | ⚠️ | protocol 已版本化；三项设计决策已签字冻结（2026-10-20），建议投稿前补注册号 |
 
-## 待办（阻塞投稿的 3 项硬缺口）
-1. **伦理/IRB 状态**须由作者书面确认（条目 21）。
-2. **数据与代码公开**须落实真实仓库 URL（条目 22），不得写 "available on request"。
-3. **三项设计决策待作者签字**：主结局 D1、预测锚点 Intubation、手术分组映射表
-   （当前已按 config 在管线中暂固化执行，改动任一需重跑 s2→s3）。
+## 待办（阻塞投稿的 2 项硬缺口）
+1. **伦理/IRB 状态**须由作者书面确认（条目 21）：回顾性豁免/备案函（无编号、无日期，路线 B 已如实声明）。
+2. **数据与代码公开**须落实真实仓库 URL（条目 22），不得写 "available on request"（已用实名仓库 URL）。
+
+## 已闭环
+- **三项设计决策已签字冻结（2026-10-20）**：主结局 D1、预测锚点 Intubation、手术分组映射表。
+- 稿件已完成 Round-1 + Round-2 修订（v0.1 工作稿）：审计追踪、TRIPOD+AI 清单、MAP-only DCA 基准、
+  表 5 测试集口径、条件患病率（2,622/15,365 = 17.1%，修正原 14,965/17.5% 笔误）、伦理声明、参考文献均已更新。
 """.format(nf=len(fd["features"]), lp=leak_pass, n=N, pos=d1["positive_pids"],
            nb=metrics["n_bootstrap"], slope=cp["calib_slope"])
 open(os.path.join(RES, "s4_tripod_ai.md"), "w", encoding="utf-8").write(TRIPOD)
@@ -340,8 +343,9 @@ add("density.nmap_per_case_median", float(_pp["p50"]), "results/s1_data_quality.
 # 1,496 例监测稀疏排除 + 条件患病率
 _n_ge10 = dq1["postanchor_nmap_measurements"]["n_ge_10"]
 add("outcome.D1.n_cases_lt10_postanchor_map", N - _n_ge10, "results/s1_data_quality.json + results/s1_cohort.json", S1)
-add("outcome.D1.conditional_prevalence_ge10meas", round(d1["positive_pids"] / (N - _n_ge10), 4),
+add("outcome.D1.conditional_prevalence_ge10meas", round(d1["positive_pids"] / _n_ge10, 4),
     "results/s1_outcomes_postanchor.json + results/s1_data_quality.json", S1)
+add("outcome.D1.n_eligible_ge10_postanchor_map", _n_ge10, "results/s1_data_quality.json", S1)
 
 # 表 3 病例计数覆盖率（与正文 Coverage(%) 一致），另存为 case_count 行
 _feat = pd.read_csv(os.path.join(RES, "s2_features.csv"))
