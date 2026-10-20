@@ -11,7 +11,7 @@ Checks:
   1. Abstract word count <= 350 (BMC Anesthesiology limit)
   2. Total manuscript word count
   3. docx embeds 6 figures and 8 tables (Table 8 = sensitivity analyses)
-  4. References: 18 entries, numbered contiguously 1..N
+  4. References: 21 entries, numbered contiguously 1..N
   5. No leftover placeholders ([RESULT]/[S3_RESULT]/[S6_RESULT]/TODO/FIXME/XXX)
   6. Anchor ratio present (82.0/18.0; 13,834/3,027)
   7. External transportability block present (3,735 / 6,388 / 214)
@@ -82,7 +82,7 @@ for ln in lines:
         ref_block += "\n" + ln
 ref_nums = re.findall(r"(?m)^\s*(\d+)\.\s", ref_block)
 ref_count = len(set(ref_nums))
-add("References count == 18", ref_count == 18, "%d references found" % ref_count)
+add("References count == 21", ref_count == 21, "%d references found" % ref_count)
 ref_nums_int = sorted(int(x) for x in set(ref_nums))
 contiguous = ref_nums_int == list(range(1, len(ref_nums_int) + 1))
 add("References numbered contiguously 1..N", contiguous,

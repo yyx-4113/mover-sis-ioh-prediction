@@ -35,7 +35,7 @@ pressure to outcomes [15]. These findings shifted attention from the
 lowest recorded value towards the *cumulative burden* of hypotensive exposure.
 
 That shift created a demand for anticipation. Commercial indices derived from arterial waveforms,
-most notably the Hypotension Prediction Index, have been evaluated in randomised trials [2,3],
+most notably the machine-learning Hypotension Prediction Index [19], have been evaluated in randomised trials [2,3],
 and a growing literature applies machine learning to routinely recorded vital signs. Two features
 of this literature motivate the present study.
 
@@ -164,7 +164,7 @@ leaves, learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 sampl
 penalty 1.0, balanced class weighting) used native handling of missing values and required no
 imputation. Hyperparameters were fixed a priori on clinical-iterative grounds rather than by
 external tuning; with 335 logistic parameters against 2,097 training events (events per variable
-≈6.3), the full logistic model is expected to be over-fitted and is reported as a comparator
+≈6.3, below the commonly cited 10-events-per-parameter heuristic [20]), the full logistic model is expected to be over-fitted and is reported as a comparator
 rather than a deployable model.
 
 ### External validation cohort
@@ -217,7 +217,7 @@ intervals came from 1,000 bootstrap resamples of the test set. Calibration was a
 the primary model, improved by isotonic regression fitted on out-of-fold predictions from a
 5-fold cross-validation within the training data, then applied unchanged to the test set.
 Calibration slope and intercept were reported on both the probability scale (linear-probability
-model) and the log-odds scale (logistic recalibration). Decision curve analysis quantified net
+model) and the log-odds scale (logistic recalibration), in keeping with current guidance on calibration assessment [21]. Decision curve analysis quantified net
 benefit across threshold probabilities.
 
 Predictor importance was reported as XGBoost gain. Because gain reflects the fitted model rather
@@ -851,6 +851,9 @@ an author.
 16. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
 17. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
 18. Lee HC, Park Y, Yoon SB, Yang SM, Park D, Jung CW. VitalDB, a high-fidelity multi-parameter vital signs database in surgical patients. Sci Data. 2022 Jun 8;9(1):279. doi:10.1038/s41597-022-01411-5. PMID: 35676300; PMCID: PMC9178032.
+19. Hatib F, Jian Z, Buddi S, Lee C, Settels J, Sibert K, et al. Machine-learning algorithm to predict hypotension based on high-fidelity arterial pressure waveform analysis. Anesthesiology. 2018;129(4):663–674. doi:10.1097/ALN.0000000000002300. PMID: 29894315.
+20. Riley RD, Ensor J, Snell KIE, Harrell FE Jr, Martin GP, Reitsma JB, et al. Calculating the sample size required for developing a clinical prediction model. BMJ. 2020 Mar 18;368:m441. doi:10.1136/bmj.m441. PMID: 32184264.
+21. Van Calster B, McLernon DJ, van Smeden M, Wynants L, Steyerberg EW; Topic Group 'Evaluating diagnostic tests and prediction models' of the STRATOS initiative. Calibration: the Achilles heel of predictive analytics. BMC Med. 2019 Dec 16;17(1):230. doi:10.1186/s12916-019-1466-7. PMID: 31842878; PMCID: PMC6912996.
 
 ## Figure legends
 
