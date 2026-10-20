@@ -1,0 +1,19 @@
+{
+  "external_source": "VitalDB",
+  "n_cases": 3735,
+  "n_d1_positive": 214,
+  "prevalence_D1": 0.0573,
+  "auprc": 0.16,
+  "auprc_ci95": [
+    0.1291,
+    0.2021
+  ],
+  "auroc": 0.7507,
+  "auroc_ci95": [
+    0.7133,
+    0.7844
+  ],
+  "brier": 0.1789,
+  "pred_mean": 0.365,
+  "note": "MOVER \u6838\u5fc3\u6a21\u578b\uff0853 \u5217\u53ef\u79fb\u690d\u5b50\u96c6\uff0cseed=12345\uff09\u76f4\u63a5\u5957\u7528\u5230 VitalDB \u52a8\u8109 MAP \u961f\u5217\uff0c\u672a\u7528\u5916\u90e8\u6570\u636e\u91cd\u62df\u5408/\u91cd\u6821\u51c6\uff1banchor_is_intubation=0\u3001or_year=0\uff08VitalDB \u4e0d\u53ef\u5f97\uff09\uff0canchor_minus_or_start=\u624b\u672f\u5f00\u59cb\u8ddd\u75c5\u4f8b\u8d77\u59cb\u5206\u949f\u3002"
+}

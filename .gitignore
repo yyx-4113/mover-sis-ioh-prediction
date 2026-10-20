@@ -15,3 +15,11 @@ scripts/results/s2_fuzzy_match_log.csv
 __pycache__/
 *.pyc
 *.pyo
+
+# VitalDB external-validation raw cache (large; regenerable via scripts/ext_download.py)
+data_vitaldb/
+
+# VitalDB external-validation per-case derived data (regenerable via scripts/ext_*.py; not redistributed)
+results/ext/vitaldb_features.csv
+results/ext/vitaldb_labels.csv
+results/ext/vitaldb_predictions.csv

@@ -68,20 +68,21 @@ for ln in lines:
         ref_block += "\n" + ln
 ref_nums = re.findall(r"(?m)^\s*(\d+)\.\s", ref_block)
 ref_count = len(set(ref_nums))
-add("References count == 18", ref_count == 18, "%d references found" % ref_count)
+add("References count == 19", ref_count == 19, "%d references found" % ref_count)
 
 # ---- docx structure ---------------------------------------------------------
 doc = Document(DOCX)
 n_images = sum(1 for r in doc.part.rels.values() if "image" in r.reltype)
 n_tables = len(doc.tables)
-add("docx embeds 5 figures", n_images == 5, "%d images" % n_images)
-add("docx has 6 tables", n_tables == 6, "%d tables" % n_tables)
+add("docx embeds 6 figures", n_images == 6, "%d images" % n_images)
+add("docx has 7 tables", n_tables == 7, "%d tables" % n_tables)
 
 # ---- key numbers present (cross-checked vs s3) ------------------------------
 key_numbers = ["0.347", "0.722", "0.234", "0.301", "0.337", "0.339", "0.733",
                "0.1555", "2,622", "16,861", "13,834", "3,027",
                "175.5", "75.2", "72.2", "69.1", "64.1", "52.9",
-               "0.909", "0.008", "0.119", "0.191", "2.23", "82.1", "17.9", "15,365"]
+               "0.909", "0.008", "0.119", "0.191", "2.23", "82.1", "17.9", "15,365",
+               "0.160", "0.751", "3,735", "214", "0.179", "5.73", "0.698", "0.710"]
 missing = [k for k in key_numbers if k not in md]
 add("Key headline numbers present", len(missing) == 0,
     "all %d present" % len(key_numbers) if not missing else "MISSING: " + ", ".join(missing))

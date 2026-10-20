@@ -1,4 +1,4 @@
-# Prediction of sustained intraoperative hypotension burden from data available at anaesthesia induction: model development and internal validation in the MOVER/SIS cohort
+# Prediction of sustained intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with external validation in VitalDB
 
 **Yongxin Yang**¹  ORCID 0009-0004-9698-6552
 
@@ -12,33 +12,33 @@ Correspondence: Yongxin Yang — 960856791@qq.com
 ## Abstract
 
 **Background:** Intraoperative hypotension is associated with kidney and myocardial injury.
-Reported performance of machine-learning models for anticipating it varies widely, and
-near-perfect discrimination has been claimed on public datasets whose blood-pressure recordings
-are sparse. We developed and internally validated a model predicting cumulative hypotension
-burden over the remainder of surgery from data available at the anaesthesia induction anchor.
+Reported machine-learning performance varies widely, and near-perfect discrimination has been claimed
+on public datasets with sparse blood-pressure recordings. We developed and validated (internally and
+externally) a model predicting cumulative hypotension burden over the remainder of surgery from data
+available at the anaesthesia induction anchor.
 
 **Methods:** Retrospective cohort from MOVER/SIS (University of California Irvine; data use
-agreement). Of 19,114 screened records, 16,861 adult cases had a valid anchor (first Intubation
+agreement). Of 19,114 screened records, 16,861 adult cases had a valid anchor (first intubation
 event, 82.1%; otherwise surgery start, 17.9%). The primary outcome required ≥10 mean arterial
-pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. All 206 predictors were
-truncated at the anchor. Four models were fitted: baseline logistic (age, sex, body mass index),
-full logistic, XGBoost and LightGBM. Validation used a patient-level 80/20 split (primary) and a
-temporal split (secondary). The primary metric was area under the precision–recall curve (AUPRC);
-AUROC and Brier score were secondary; 1,000 bootstrap resamples gave confidence intervals.
-Out-of-fold isotonic calibration and decision curve analysis were performed.
+pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. Predictors were truncated at
+the anchor; four models were fitted (baseline, full logistic, XGBoost, LightGBM). Validation used
+patient-level (primary) and temporal (secondary) splits; the unchanged MOVER core model was also
+applied to the VitalDB arterial cohort (n = 3,735; anchor adapted from intubation to operation
+start; no refitting). AUPRC was the primary metric; AUROC, Brier and 1,000 bootstrap confidence
+intervals were secondary; out-of-fold isotonic calibration and decision curve analysis were performed.
 
 **Results:** The outcome occurred in 2,622 of 16,861 cases (15.55%). XGBoost achieved AUPRC 0.347
 (95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split, versus 0.234
 (baseline), 0.301 (full logistic) and 0.337 (LightGBM); on the temporal split it achieved 0.339
 (0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191
-to 0.119 (slope 0.909; intercept 0.008). Net benefit at a threshold of 0.15 was 0.050.
-Performance was higher in women (0.357 vs 0.299), patients under 50 years (0.380 vs 0.186 at ≥65
-years) and underweight patients (0.616). Pre-anchor mean MAP was the dominant predictor.
+to 0.119. Performance was higher in women and younger patients; pre-anchor mean MAP was the dominant
+predictor. Externally (VitalDB, prevalence 5.7%), the unchanged model retained discrimination
+(AUROC 0.751, 95% CI 0.713–0.784; AUPRC 0.160, 0.129–0.202) but probabilities were uncalibrated.
 
 **Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest
-but non-null discrimination for cumulative hypotension burden and was well calibrated. Most
-information resided in the pre-anchor arterial pressure level. External validation is required
-before clinical application.
+but non-null discrimination for cumulative hypotension burden and was well calibrated. External
+validation confirmed transfer of discrimination but not of absolute probabilities, which would
+require local recalibration before clinical use.
 
 **Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean
 arterial pressure; perioperative medicine; calibration; TRIPOD
@@ -82,7 +82,7 @@ hypotensive at the prediction origin are excluded and the grey zone is retained 
 scoping review of perioperative artificial intelligence found external validation and
 bias-resistant evaluation to be uncommon [6].
 
-We therefore set out to develop and internally validate a model for the *cumulative burden* of
+We therefore set out to develop and validate (internally and externally) a model for the *cumulative burden* of
 hypotension over the remainder of surgery, using only information available at the anaesthesia
 induction anchor, and to report it under an explicit leakage audit, with calibration and
 decision-analytic evaluation, and with an honest account of what the recording density of the
@@ -93,7 +93,7 @@ source data permits.
 ### Study design and data source
 
 This is a retrospective cohort study reported in accordance with TRIPOD+AI [7]; it corresponds to
-TRIPOD type 2a (development with internal validation, no external validation). The data source was
+TRIPOD type 2b (development with internal and external validation). The development data source was
 MOVER (Medical Informatics Operating Room Vitals and Events Repository), University of California
 Irvine, distributed through the UCI Machine Learning Repository [8]. The extraction analysed here
 is the surgical information system (SIS) component, comprising nine linked tables: patient
@@ -171,6 +171,24 @@ median imputation with missingness indicators and standardisation, with balanced
 child weight 10, L2 penalty 1.0, class-weight scaling) and *LightGBM* (300 trees, 15 leaves,
 learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 samples per leaf, L2 penalty
 1.0, balanced class weighting) used native handling of missing values and required no imputation.
+
+### External validation cohort
+
+To test generalisability beyond the development site, the MOVER core model was applied unchanged to
+VitalDB [19], an independent public database of high-fidelity vital signs from surgical patients at
+a single tertiary centre (Seoul National University Hospital, Republic of Korea), accessed through
+its public application programming interface without authentication. Because VitalDB records no
+intubation event, the prediction anchor was adapted from the MOVER intubation anchor to the
+operation start time (opstart), the closest available analogue, and the outcome D1 was computed
+identically over the window [opstart, opend]. The external cohort comprised cases with an arterial
+mean arterial pressure track (Solar8000/ART_MBP or EV1000/ART_MBP) and valid opstart/opend times
+(n = 3,735). Predictors were restricted to the 53-feature transportable subset (demographics and
+pre-anchor 15-minute vital-sign statistics) available in both resources; MOVER-specific timing
+signals (anchor is intubation, intubation event recorded) and the calendar-year indicator, which are
+not derivable from VitalDB, were set to zero. The MOVER core model (53 features, seed 12,345) was
+applied without any external refitting or recalibration; performance was summarised by AUPRC
+(primary), AUROC and Brier score, with 95% confidence intervals from 1,000 bootstrap resamples.
+Calibration was assessed descriptively and was not updated on the external data.
 
 ### Validation and performance
 
@@ -404,6 +422,32 @@ pressure summaries.
 | 9 | Minimum invasive diastolic pressure | Invasive monitoring | 44.7 |
 | 10 | Mean invasive MAP | Invasive monitoring | 43.2 |
 
+### External validation
+
+The MOVER core model was applied without refitting to the VitalDB arterial cohort of 3,735 cases, of
+which 214 (5.73%) met the D1 outcome (Table 7). Discrimination transferred: the external AUROC was
+0.751 (95% CI 0.713–0.784), numerically above the internal patient-level value of 0.698 and the
+temporal value of 0.710 for the same 53-feature model, and the external AUPRC of 0.160
+(0.129–0.202) exceeded the external prevalence by a factor of 2.8, a larger relative lift than the
+2.1-fold internal value for that model. The lower absolute AUPRC reflects the much lower external
+prevalence (5.73% vs 15.55%) rather than a loss of ranking ability. Absolute probabilities did not
+transfer: the mean predicted risk was 0.37 against an observed prevalence of 0.057 (external Brier
+score 0.179), indicating that the model would require local recalibration before the predicted
+probabilities could be used directly. These results are summarised in Figure 6 and Table 7.
+
+**Table 7. External validation of the MOVER core model (53 features) in VitalDB versus internal
+performance of the same model in MOVER/SIS.**
+
+| Dataset | Split | n | Events | Prevalence (%) | AUPRC (95% CI) | AUROC (95% CI) | Brier |
+|---|---|---|---|---|---|---|---|
+| MOVER/SIS (development) | Patient | 3,373 | 525 | 15.55 | 0.321 (0.284–0.362) | 0.698 (0.673–0.723) | 0.198 |
+| MOVER/SIS (development) | Temporal | 1,818 | 291 | 15.55 | 0.314 (0.269–0.365) | 0.710 (0.679–0.740) | 0.199 |
+| VitalDB (external) | — | 3,735 | 214 | 5.73 | 0.160 (0.129–0.202) | 0.751 (0.713–0.784) | 0.179 |
+
+Internal values are for the identical 53-feature transportable model; the development manuscript
+headline (AUPRC 0.347, AUROC 0.722) is for the full 206-feature model. The external cohort had no
+refitting or recalibration.
+
 ## Discussion
 
 ### Principal findings
@@ -456,15 +500,17 @@ information for hypotension [13]. Our recording density (median 3 MAP readings i
 pre-anchor window) is too sparse to characterise such dynamics, so our model necessarily leans on
 the static pre-anchor level; this is a limitation of the source data rather than evidence against
 the dynamics signal. Other investigators have developed machine-learning models for intraoperative
-risk from comparable operating-room resources, including external-validation studies [14,15]; this
-underscores that our internal-validation design leaves external generalisability untested.
-Performance of the order of 0.97 would require near-separation of the classes, which is difficult to
-reconcile with the recording density reported here, and we flag the possibility of label–feature
-window overlap or of counting as predictable those cases already below threshold at the prediction
-origin. We regard these as general methodological hazards in perioperative prediction rather than
-criticisms specific to one report, and we note that external validation and bias-resistant
-evaluation remain uncommon in this literature [6] and that our own estimate carries the same
-absence of external validation.
+risk from comparable operating-room resources, including external-validation studies [14,15]. We now
+provide such an external validation ourselves, in VitalDB, an independent resource with a different
+recording architecture; the model's ranking ability transferred (external AUROC 0.751, above the
+internal 0.698–0.710 for the same 53-feature model) while absolute probabilities did not and would
+require local recalibration — a finding that strengthens rather than weakens the caution above.
+Performance of the order of 0.97 would still require near-separation of the classes, which is
+difficult to reconcile with the recording density reported here, and we flag the possibility of
+label–feature window overlap or of counting as predictable those cases already below threshold at
+the prediction origin. We regard these as general methodological hazards in perioperative prediction
+rather than criticisms specific to one report, and we note that external validation and
+bias-resistant evaluation remain uncommon in this literature [6].
 
 ### Implications
 
@@ -485,8 +531,16 @@ signals, rather than in revealing hidden physiology.
 
 ### Limitations
 
-1. **No external validation.** This is a single-centre development with internal validation only
-   (TRIPOD type 2a). Discrimination and, in particular, calibration may not transfer.
+1. **External validation was performed with necessary adaptations and shows transfer of
+   discrimination but not of calibration.** The model was validated externally in VitalDB without
+   refitting or recalibrating; the anchor was adapted from intubation to operation start (VitalDB
+   records no intubation event) and MOVER-specific timing signals were set to zero. The external
+   cohort had a substantially lower outcome prevalence (5.73% vs 15.55%) and a different
+   recording architecture (continuous arterial pressure rather than intermittent non-invasive
+   measurement), so the external AUPRC cannot be compared directly with the internal value; the
+   external AUROC (0.751) indicates that ranking transferred. Predicted probabilities were not
+   calibrated to the external cohort (mean predicted risk 0.37 vs observed 0.057), so the external
+   result supports deployment readiness of the *discrimination* but not of the *probabilities*.
 2. **Severe sparsity of non-invasive blood pressure.** Median 3 readings in the 15-minute
    pre-anchor window; 96.2% of recording segments are single minutes. This caps achievable
    performance and makes any sustained-duration definition effectively unmeasurable.
@@ -547,18 +601,26 @@ in perioperative hypotension prediction and that hold independently of the discr
    reframes the result as a calibrated risk-stratification aid anchored on the pre-induction pressure
    rather than a discovery of new physiology, and supplies future work with a realistic baseline on
    this resource.
+5. **An honest external validation on an independent resource.** In VitalDB the model was applied
+   unchanged; discrimination transferred (AUROC 0.751, exceeding the internal 0.698–0.710 for the
+   same feature set) while calibration did not, isolating exactly what does and does not generalise
+   and supplying a concrete deployment requirement (local recalibration) rather than an abstract
+   "needs external validation" caveat.
 
 ## Conclusions
 
 Using only data available at the anaesthesia induction anchor, a gradient-boosted model achieved
 modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for cumulative intraoperative
 hypotension burden, reproduced under temporal validation and well calibrated after isotonic
-recalibration. Most of the predictive information resided in the pre-anchor arterial pressure
-level, suggesting that such models primarily identify patients who are already relatively
-hypotensive at induction rather than anticipating new events. We recommend that future work on
-this and similar resources prioritise external validation, explicit reporting of the outcome
-definition and its prevalence, and routine quantification of recording density, and that claims of
-near-perfect discrimination on sparse non-invasive data be treated with corresponding caution.
+recalibration. In an independent external cohort (VitalDB, n = 3,735) the same model retained
+discrimination (AUROC 0.751) without refitting, although absolute probabilities were not calibrated
+to that cohort and would require local updating. Most of the predictive information resided in the
+pre-anchor arterial pressure level, suggesting that such models primarily identify patients who are
+already relatively hypotensive at induction rather than anticipating new events. We recommend that
+future work on this and similar resources prioritise local recalibration at deployment, explicit
+reporting of the outcome definition and its prevalence, and routine quantification of recording
+density, and that claims of near-perfect discrimination on sparse non-invasive data be treated with
+corresponding caution.
 
 ---
 
@@ -569,7 +631,7 @@ area under the precision–recall curve; BMI, body mass index; DUA, data use agr
 intraoperative hypotension; IQR, interquartile range; MAP, mean arterial pressure; MOVER, Medical
 Informatics Operating Room Vitals and Events Repository; OR, operating room; SIS, surgical
 information system; SpO₂, peripheral oxygen saturation; TRIPOD, Transparent Reporting of a
-multivariable prediction model for Individual Prognosis Or Diagnosis.
+multivariable prediction model for Individual Prognosis Or Diagnosis; VitalDB, Vital Signs Database.
 
 ## Declarations
 
@@ -665,6 +727,7 @@ an author.
     hypotension. Anesthesiology. 2013;119(3):507–515.
 17. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
 18. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
+19. Lee S, Park J, Lee S, Park Y, Kim S, Kim T, et al. VitalDB, a high-fidelity vital signs database in surgical patients. Sci Data. 2022;9:279. doi:10.1038/s41597-022-01794-9.
 
 ## Figure legends
 
@@ -684,6 +747,8 @@ isotonic recalibration, and net benefit across threshold probabilities for XGBoo
 logistic benchmark, treat all and treat none.
 
 **Figure 5. Predictor importance.** Twenty-five highest-gain predictors from XGBoost.
+
+**Figure 6. External validation in VitalDB.** Receiver operating characteristic (left), precision–recall (centre) and predicted-risk distribution (right) for the MOVER core model applied unchanged to the VitalDB arterial cohort (n = 3,735; outcome prevalence 5.73%).
 
 ## Additional files
 

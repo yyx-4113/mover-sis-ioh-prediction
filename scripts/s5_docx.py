@@ -21,6 +21,7 @@ FIG_MAP = {
     3: "fig3_pr_roc.png",
     4: "fig4_calib_dca.png",
     5: "fig5_importance.png",
+    6: "fig6_external_validation.png",
 }
 
 
