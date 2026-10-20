@@ -1,40 +1,39 @@
-# TRIPOD+AI (2024) 清单 — 01 SIS 术中低血压预测
+# TRIPOD+AI (2024) checklist — 01 SIS intraoperative hypotension prediction
 
-> 状态图例：✅ 已满足 / 有产物支撑　⚠️ 部分满足 / 需补写　⏳ 待补（稿件阶段）
-> 每项标注"正文段落 / 产物文件"，便于投稿前逐项核对。
+> Status legend: **Met** = satisfied / backed by a product file; **Partial** = partly met / needs author follow-up; **To-do** = pending (manuscript stage).
+> Each item cites "manuscript section / product file" for pre-submission verification.
 
-| # | TRIPOD+AI 条目 | 状态 | 位置 / 证据 |
+| # | TRIPOD+AI item | Status | Location / evidence |
 |---|---|---|---|
-| 1 | **Title**：明确为预测模型研究（含 ML） | ✅ | manuscript_v0.1.md 标题 |
-| 2 | **Abstract**：结构化，含数据来源、模型、性能 | ✅ | 已完成（结构化摘要，350 词内） |
-| 3 | **Objectives**：明确临床问题与预测目标 | ✅ | protocol §1；锚点后 IOH |
-| 4 | **Data sources**：数据来源、时间跨度、检索方式 | ✅ | `s1_cohort.json`；SIS EMR 九表，2015-11~2018-10 |
-| 5 | **Eligibility**：纳入排除标准 | ✅ | protocol §2；`s1_cohort.json`（瀑布各项和自洽） |
-| 6 | **Outcome**：结局定义与判定方式 | ✅ | protocol §3；14 定义敏感性矩阵 `s1_outcomes_postanchor.json` |
-| 7 | **Predictors**：全部候选预测因子及定义、测量时点 | ✅ | `s2_feature_dictionary.json`（206 个特征逐条注域/来源表/窗口） |
-| 8 | **Temporal/leakage**：预测因子须早于预测时点 | ✅ **强证据** | `s2_data_quality.json.leakage_audit`：各域 `max_used_time_minus_anchor ≤ 0`，ALL_PASS=True |
-| 9 | **Missing data**：缺失处理方式 | ✅ | 树模型原生 NaN；Logistic 中位数插补+缺失指示（`s3_models.py`） |
-| 10 | **Statistical / ML methods**：模型族、超参、软件版本 | ✅ | `s3_metrics.json`（seed/超参固定）；config `runtime` 记录版本 |
-| 11 | **Sample size / EPV**：样本量与事件数论证 | ✅ | n=16861，事件 2622（EPV 充足）；见 `s1_outcomes_postanchor.json` |
-| 12 | **Validation**：内部/外部验证策略 | ✅ | 患者级（主）+ 时间切分（次）；`s3_metrics.json` |
-| 13 | **Performance measures**：主指标与不确定性 | ✅ | 主 AUPRC；1000 次 bootstrap 95% CI；`s3_metrics.json` |
-| 14 | **Calibration**：校准评估与方法 | ✅ | OOF isotonic；`s3_calib_dca.json`（斜率 0.9092） |
-| 15 | **Clinical utility**：决策曲线/净收益 | ✅ | DCA；`s3_calib_dca.json.dca` |
-| 16 | **Participants**：描述参与者特征 | ✅ | `s2_data_quality.json`（人口学/BMI/手术分组分布） |
-| 17 | **Model specification**：最终模型可获取 | ✅ | 脚本 + 产物完整可复现；建议附代码仓库 |
-| 18 | **Subgroups**：亚组性能 | ✅ | `s3_subgroups.json`（性别/年龄/BMI） |
-| 19 | **Limitations**：局限性（含偏倚来源） | ✅ | protocol §9；本报告 §8 |
-| 20 | **Interpretation**：临床可解释性 | ✅ | `s3_feature_importance.json`（MAP 主导，逻辑自洽） |
-| 21 | **Ethics / IRB**：伦理审批与知情同意 | ⚠️ | 回顾性去标识数据；**须由作者确认本单位伦理审批状态** |
-| 22 | **Data availability**：数据与代码可获取 | ⚠️ | 产物齐备；**须落实公开仓库/DOI**（禁写 "available on request"） |
-| 23 | **Funding / COI** | ⏳ | 待作者补充 |
-| 24 | **Registration**：研究是否预注册 | ⚠️ | protocol 已版本化；三项设计决策已签字冻结（2026-10-20），建议投稿前补注册号 |
+| 1 | **Title**: identified as a prediction-model study (with ML) | Met | manuscript_v0.1.md title |
+| 2 | **Abstract**: structured, with data source, model, performance | Met | structured abstract completed (within 350 words) |
+| 3 | **Objectives**: clear clinical question and prediction target | Met | protocol §1; post-anchor cumulative IOH burden |
+| 4 | **Data sources**: source, period, retrieval | Met | `s1_cohort.json`; SIS EMR nine tables, 2015-11 to 2018-10 |
+| 5 | **Eligibility**: inclusion / exclusion criteria | Met | protocol §2; `s1_cohort.json` (cohort waterfall and self-consistency) |
+| 6 | **Outcome**: definition and ascertainment | Met | protocol §3; 14-definition sensitivity matrix `s1_outcomes_postanchor.json` |
+| 7 | **Predictors**: all candidate predictors, definitions, timing | Met | `s2_feature_dictionary.json` (206 features, domain / source / window per feature) |
+| 8 | **Temporal / leakage**: predictors must precede prediction time | Met (strong) | `s2_data_quality.json.leakage_audit`: every domain `max_used_time_minus_anchor ≤ 0`, ALL_PASS = True |
+| 9 | **Missing data**: handling | Met | native NaN for tree models; median imputation + missing indicators for logistic (`s3_models.py`) |
+| 10 | **Statistical / ML methods**: model family, hyperparameters, software versions | Met | `s3_metrics.json` (fixed seed / hyperparameters); config `runtime` records versions |
+| 11 | **Sample size / EPV**: justification | Met | n = 16,861, events 2,622 (adequate EPV); see `s1_outcomes_postanchor.json` |
+| 12 | **Validation**: internal / external strategy | Met | patient-level (primary) + temporal (secondary); `s3_metrics.json` |
+| 13 | **Performance measures**: primary metric and uncertainty | Met | primary AUPRC; 1,000-bootstrap 95% CI; `s3_metrics.json` |
+| 14 | **Calibration**: assessment and method | Met | OOF isotonic; `s3_calib_dca.json` (logit-slope 0.9087, intercept −0.1831) |
+| 15 | **Clinical utility**: decision curve / net benefit | Met | DCA; `s3_calib_dca.json.dca` |
+| 16 | **Participants**: participant characteristics described | Met | `s2_data_quality.json` (demographics / BMI / procedure-group distributions) |
+| 17 | **Model specification**: final model obtainable | Met | scripts + products fully reproducible; code repository recommended |
+| 18 | **Subgroups**: subgroup performance | Met | `s3_subgroups.json` (sex / age / BMI) |
+| 19 | **Limitations**: limitations (incl. bias sources) | Met | protocol §9; report §8 (Limitations 1–14) |
+| 20 | **Interpretation**: clinical interpretability | Met | `s3_feature_importance.json` (MAP-dominated, internally consistent) |
+| 21 | **Ethics / IRB**: approval and consent | Partial | retrospective de-identified data; **author must confirm institutional IRB status** |
+| 22 | **Data availability**: data and code obtainable | Partial | products complete; **real repository URL / DOI required** (never "available on request") |
+| 23 | **Funding / COI** | To-do | author to supply |
+| 24 | **Registration**: study registration | Partial | protocol versioned; three design decisions signed-off and frozen (2026-10-20); pre-registration number recommended before submission |
 
-## 待办（阻塞投稿的 2 项硬缺口）
-1. **伦理/IRB 状态**须由作者书面确认（条目 21）：回顾性豁免/备案函（无编号、无日期，路线 B 已如实声明）。
-2. **数据与代码公开**须落实真实仓库 URL（条目 22），不得写 "available on request"（已用实名仓库 URL）。
+## Blocking pre-submission gaps (2)
+1. **Ethics / IRB status** must be confirmed in writing by the author (item 21): retrospective waiver / filing letter (no number, no date; route B honestly declared).
+2. **Public data / code** must resolve to a real repository URL (item 22); "available on request" is prohibited (real named-repository URL already used).
 
-## 已闭环
-- **三项设计决策已签字冻结（2026-10-20）**：主结局 D1、预测锚点 Intubation、手术分组映射表。
-- 稿件已完成 Round-1 + Round-2 修订（v0.1 工作稿）：审计追踪、TRIPOD+AI 清单、MAP-only DCA 基准、
-  表 5 测试集口径、条件患病率（2,622/15,365 = 17.1%，修正原 14,965/17.5% 笔误）、伦理声明、参考文献均已更新。
+## Closed
+- **Three design decisions signed-off and frozen (2026-10-20)**: primary outcome D1, prediction anchor Intubation, procedure-group mapping table.
+- Manuscript passed an independent 4-reviewer panel (Round-6) and a consistency gate (13/13: abstract ≤350 words, 18 contiguous references, 8 tables / 6 figures in docx, no placeholders, anchor & external blocks present, all 16 product-derived model metrics present, DCA net benefit @0.15 = 0.051 / 0.058 with correct sign, Limitations 1–14). Round-7 verification corrected the abstract and Table 4 to exact product values (baseline AUPRC 0.233, LightGBM AUPRC 0.338).

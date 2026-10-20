@@ -3,7 +3,7 @@
 
 输入：SIS EMR 九表 + results/s1_anchor.csv（s1 v1.2.0 产出的每 PID 预测锚点）
 输出：
-  results/s2_features.csv            PID × 特征矩阵（分析队列 17,103 行）
+  results/s2_features.csv            PID × 特征矩阵（分析队列 16,861 行）
   results/s2_feature_dictionary.json 每个特征的域/来源表/窗口/定义
   results/s2_data_quality.json       各域覆盖率 + 泄漏审计 + 单位异常
   results/s2_procedure_groups.csv    手术分组明细
@@ -14,7 +14,9 @@ v1.0.0（2026-10-19）
 =====================================================================
 【设计纪律】
 1. 全部特征必须早于预测锚点 anchor_time。锚点 = 首个 Intubation 事件
-   （中位 OR_start+13 min），无 Intubation 者以 Surgery_start 兜底。
+   （中位 OR_start 后约 14 min，精确分位数见 s1_data_quality.json
+   anchor_minus_or_start_min.intubation_only_p50），无 Intubation 者以
+   Surgery_start 兜底。
    每个域读入后第一件事就是按 `time <= anchor_time` 截断，截断结果写入
    s2_data_quality.json 的 leakage_audit（max_used_time_minus_anchor 必须 <= 0）。
 2. 禁止使用任何锚点之后的信息：后续生命体征、后续用药、血气、液体、出血量、
@@ -38,6 +40,13 @@ cfg = load_config(); P = paths(cfg)
 RES = P["results_dir"]
 EMR = P["sis_emr_dir"]
 W = int(cfg["features"]["window_minutes"])          # 预测窗长度（min）
+# Round-6 A2-M2：特征窗默认 [anchor-W, anchor] 闭（含锚点分钟）。
+# --half-open 生成半开变体 [anchor-W, anchor)（剔除锚点分钟）用于敏感性分析；
+# 该变体的全部产物加 _halfopen 后缀，不覆盖主口径文件。
+import sys as _sys
+HALF_OPEN = "--half-open" in _sys.argv
+ANCHOR_INCLUSIVE = not HALF_OPEN
+SUFFIX = "_halfopen" if HALF_OPEN else ""
 FEATS = []                                           # 特征字典累积
 DQ = {}                                              # 数据质量累积
 
@@ -75,13 +84,32 @@ def _leak_filter(df, time_col, anchor_df, label):
 
 
 def _window_slice(df, time_col, anchor_df, label):
-    """截断到锚点前 W 分钟窗口 [anchor-W, anchor]；返回 (窗口内 df, 审计 dict)。"""
+    """截断到锚点前 W 分钟窗口；返回 (窗口内 df, 审计 dict)。
+
+    主口径窗为 [anchor-W, anchor]（闭，ANCHOR_INCLUSIVE=True）；
+    --half-open 变体为 [anchor-W, anchor)（剔除锚点分钟）。
+    audit 记录 n_rows_at_anchor_minute：恰好落在锚点时刻的记录数——
+    这些记录同时出现在特征窗与标签窗 [anchor, OR_end] 内（Round-6 披露项）。
+    """
     used, audit = _leak_filter(df, time_col, anchor_df, label)
     used["_pre_min"] = -used._tma
-    win = used[(used._pre_min >= 0) & (used._pre_min <= W)].copy()
+    lo = 0 if ANCHOR_INCLUSIVE else np.nextafter(0, 1)   # 半开：严格 >0（即 < anchor）
+    win = used[(used._pre_min >= lo) & (used._pre_min <= W)].copy()
     audit["window_minutes"] = W
+    audit["window_closed_at_anchor"] = ANCHOR_INCLUSIVE
+    audit["n_rows_at_anchor_minute"] = int((used._pre_min == 0).sum())
+    audit["n_pids_at_anchor_minute"] = int(used.loc[used._pre_min == 0, "PID"].nunique())
     audit["n_rows_in_window"] = int(len(win))
     audit["n_pids_in_window"] = int(win.PID.nunique())
+    # ---- 窗口边界守卫（Round-6 回归教训：'>=' 误写为 '>' 会使主口径静默退化为半开窗，
+    #      并让 S2 敏感性分析空跑；此断言两类错误都会立即失败）----
+    if ANCHOR_INCLUSIVE:
+        if audit["n_rows_at_anchor_minute"] > 0:
+            assert float(win._pre_min.min()) == 0.0, \
+                f"[P0-WINDOW] {label}: 闭窗未包含锚点分钟（窗内最小 _pre_min=" \
+                f"{win._pre_min.min()}）——窗口边界回归，终止。"
+    else:
+        assert (win._pre_min > 0).all(), f"[P0-WINDOW] {label}: 半开窗包含了锚点分钟，终止。"
     return win, audit
 
 
@@ -137,7 +165,12 @@ FEATS.append({"feature": "or_year", "domain": "anchor", "source": "OR_start",
 log(STAGE, "[1/9] 人口学")
 demo = info.set_index("PID")
 feat["age"] = _num(demo.Age)
-feat["male"] = demo.Gender.fillna("").str.upper().str.startswith("M").astype(int)
+# Round-6 修复：原实现 `Gender.startswith("M")` 把 4 例 " Unknown" 一律编码为 0（女性），
+# 造成 Table 1 女性数（8,502）与特征列 male==0 计数（8,506）矛盾。现按 F/M/未知三态编码，
+# 未知留 NaN（树模型原生处理、logistic 由 pipeline 插补），不再静默并入女性。
+_g = demo.Gender.fillna("").str.strip().str.upper()
+feat["male"] = np.where(_g.str.startswith("M"), 1.0,
+                        np.where(_g.str.startswith("F"), 0.0, np.nan))
 # --- 单位错误防护：MOVER 源表的 Ht/Wt 存在单位/录入错误（实测 height 低至 2 cm、
 #     weight 高达 839 kg），直接派生会产生 BMI 高达 2.2e5 的荒谬值并污染模型与亚组。
 #    成年人合理区间外的取值一律置为缺失（保守，不做臆断填补）。
@@ -159,6 +192,21 @@ _n_w_bad = int(((_raw_w < WT_RANGE[0]) | (_raw_w > WT_RANGE[1])).sum())
 _n_b_bad = int(((_raw_bmi < BMI_RANGE[0]) | (_raw_bmi > BMI_RANGE[1])).sum())
 DQ["demographics"] = {
     "gender_values": {str(k): int(v) for k, v in demo.Gender.value_counts(dropna=False).items()},
+    "male_n": int((feat.male == 1).sum()),
+    "female_n": int((feat.male == 0).sum()),
+    "sex_unknown_n": int(feat.male.isna().sum()),
+    "age_mean": round(float(feat.age.mean()), 2),
+    "age_sd": round(float(feat.age.std()), 2),
+    "age_median": float(feat.age.median()),
+    "age_q1": float(feat.age.quantile(0.25)),
+    "age_q3": float(feat.age.quantile(0.75)),
+    "age_min": float(feat.age.min()),
+    "age_max": float(feat.age.max()),
+    "bmi_mean": round(float(feat.bmi.mean()), 2),
+    "bmi_sd": round(float(feat.bmi.std()), 2),
+    "bmi_median": float(feat.bmi.median()),
+    "bmi_q1": float(feat.bmi.quantile(0.25)),
+    "bmi_q3": float(feat.bmi.quantile(0.75)),
     "bmi_computable": int(feat.bmi.notna().sum()),
     "bmi_computable_pct": round(float(feat.bmi.notna().mean()), 4),
     "ht_missing": int(feat.height_cm.isna().sum()),
@@ -423,32 +471,70 @@ DQ["leakage_audit"].append(io_audit)
 
 
 def _io_class(t):
-    """IO 记录分类。Volume 为负 = 输出（尿液/EBL/引流），为正 = 输入。"""
+    """IO 记录分类（Round-6 修复）。
+
+    原实现从不返回 "crystalloid"：Plasmalyte/LR/NS/D5W 等晶体液全部落入
+    "other_out" 兜底，导致 crystalloid_in_ml 恒为 0，且 other_output_ml
+    混入输入容量后被取负（符号反转）。现按 Volume 符号语义 + 关键词分类：
+      输出（Volume<0）：urine / ebl / other_out（胃肠引流、胸腔引流、腹水等）
+      输入（Volume>0）：blood（血制品）/ colloid（白蛋白、羟乙基淀粉、右旋糖酐）/
+                       crystalloid（晶体与糖液）/ tpn_in / medication_iv
+    tpn_in 与 medication_iv 为营养/药物类输入，不计入六类液体容量特征，
+    仅在 s2_data_quality.json 的 io_classification 披露条数。
+    """
     tl = str(t).lower()
+    # ---- 输出类 ----
     if "urine" in tl:
         return "urine"
     if "ebl" in tl or "blood loss" in tl:
         return "ebl"
+    if any(k in tl for k in ["gastric", "ng tube", "chest tube", "ascites", "drain",
+                             "ventriculostomy", "jp drain", "csf", "liposuction"]):
+        return "other_out"
+    # ---- 输入：血液制品 ----
     if any(k in tl for k in ["prbc", "packed red", "plasma", "platelet", "cryo",
                              "cell saver", "blood"]):
         return "blood"
+    # ---- 输入：胶体 ----
     if any(k in tl for k in ["albumin", "hetastarch", "dextran"]):
         return "colloid"
-    return "other_out"
+    # ---- 输入：晶体/糖液 ----
+    if any(k in tl for k in ["saline", "nacl", "sodium chloride", "ringer", "plasmalyte",
+                             "dextrose", "d5", "d10", "ns", "glucose", "mannitol"]):
+        return "crystalloid"
+    # ---- 输入：营养/药物（不进六类液体容量特征）----
+    if "tpn" in tl:
+        return "tpn_in"
+    return "medication_iv"
 
 
 io_used["_cls"] = io_used.Type.map(_io_class)
+FLUID_OUT = {"urine", "ebl", "other_out"}          # 输出类：求和后取负转正
 if not io_used.empty:
     piv = io_used.pivot_table(index="PID", columns="_cls", values="vol",
                               aggfunc="sum").fillna(0.0)
     rename = {"crystalloid": "crystalloid_in_ml", "colloid": "colloid_in_ml",
               "blood": "blood_products_ml", "urine": "urine_out_ml",
               "ebl": "ebl_ml", "other_out": "other_output_ml"}
+    sign_violations = {}
     for src, dst in rename.items():
         v = piv[src].reindex(feat.index).fillna(0.0) if src in piv.columns else 0.0
-        feat[dst] = -v if dst in ("urine_out_ml", "ebl_ml", "other_output_ml") else v
+        # 符号守卫：输出类净量应为负、输入类净量应为正；违例条数进 DQ 披露
+        if src in piv.columns:
+            s = piv[src]
+            n_bad = int((s > 0).sum()) if src in FLUID_OUT else int((s < 0).sum())
+            if n_bad:
+                sign_violations[src] = n_bad
+        feat[dst] = -v if src in FLUID_OUT else v
         FEATS.append({"feature": dst, "domain": "fluids", "source": f"patient_input_output[{src}]",
                       "window": "<= anchor"})
+    DQ["io_classification"] = {
+        "n_records_by_class": {str(k): int(v) for k, v in
+                               io_used["_cls"].value_counts().items()},
+        "sign_violation_pids": sign_violations,
+        "note": ("tpn_in/medication_iv 为营养与药物类输入，不计入六类液体容量特征；"
+                 "符号违例 PID 数按类披露（净量与输入/输出语义相反者）。"),
+    }
     feat["has_io_record"] = feat.index.isin(io_used.PID).astype(int)
     feat["io_n_records_pre_anchor"] = feat.index.map(
         io_used.groupby("PID").size()).fillna(0).astype(int)
@@ -466,7 +552,7 @@ DQ["fluids"] = {
 log(STAGE, "组装特征矩阵")
 feat = feat.reindex(PIDS)
 feat.index.name = "PID"
-out_csv = os.path.join(RES, "s2_features.csv")
+out_csv = os.path.join(RES, f"s2_features{SUFFIX}.csv")
 feat.to_csv(out_csv)
 log(STAGE, f"features -> {out_csv}  ({feat.shape[0]} rows x {feat.shape[1]} cols)")
 
@@ -477,8 +563,9 @@ if bad:
     sys.exit(f"[P0-LEAK] 特征矩阵含锚点后信息列: {sorted(bad)}")
 
 save_json({"n_features": int(feat.shape[1]), "n_rows": int(feat.shape[0]),
-           "window_minutes": W, "features": FEATS},
-          os.path.join(RES, "s2_feature_dictionary.json"))
+           "window_minutes": W, "features": FEATS,
+           "window_closed_at_anchor": ANCHOR_INCLUSIVE},
+          os.path.join(RES, f"s2_feature_dictionary{SUFFIX}.json"))
 
 cov_summary = {}
 for f in FEATS:
@@ -494,5 +581,5 @@ for d, v in cov_summary.items():
 DQ["domain_coverage"] = cov_summary
 DQ["leakage_audit_all_pass"] = all(a["max_used_time_minus_anchor"] <= 0
                                    for a in DQ["leakage_audit"])
-save_json(DQ, os.path.join(RES, "s2_data_quality.json"))
-log(STAGE, "DONE (v1.0.0)")
+save_json(DQ, os.path.join(RES, f"s2_data_quality{SUFFIX}.json"))
+log(STAGE, f"DONE (v1.0.0{'; half-open anchor variant' if HALF_OPEN else ''})")

@@ -9,11 +9,13 @@
   "or_min_gt_1440": 4,
   "or_min_max_observed": 3156668.0
  },
+ "excl_short_or_window_ge60min_n": 0,
  "excl_short_or_window": 1632,
  "excl_underage": 371,
  "analytic_pids": 16861,
- "or_window_observations": 3559993,
  "or_min_median": 167.0,
+ "or_window_observations": 3379173,
+ "or_window_observations_layer": "analytic_16861_post_anchor",
  "excl_bad_anchor": 242,
  "anchor_source_counts": {
   "Intubation": 13834,

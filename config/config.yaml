@@ -31,7 +31,8 @@ inputs:
 # 队列规则（protocol §2）
 cohort:
   min_age: 18
-  min_or_window_minutes: 60        # OR 窗口内 1-min 观测下限
+  min_or_window_records: 60         # OR 窗内生命体征记录条数下限（Round-6 更正：实现为"条数"而非"分钟"；
+                                    # 原键名 min_or_window_minutes 与注释误导，383 例实际窗长 >=60min 亦被剔除）
   max_or_window_minutes: 1440      # v1.1.0 新增：OR 窗口上界（0<or_min<=1440，剔除脏时间戳）
 
 # 结局定义（protocol §3 敏感性矩阵）

@@ -1,4 +1,4 @@
-# Prediction of cumulative intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with external validation in VitalDB
+# Prediction of cumulative intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with an external transportability check in VitalDB
 
 **Yongxin Yang**¹  ORCID 0009-0004-9698-6552
 
@@ -11,42 +11,15 @@ Correspondence: Yongxin Yang — 960856791@qq.com
 
 ## Abstract
 
-**Background:** Intraoperative hypotension is associated with kidney and myocardial injury.
-Reported machine-learning performance varies widely, and near-perfect discrimination has been claimed
-on public datasets with sparse blood-pressure recordings. We developed and validated (internally and
-externally) a model predicting cumulative hypotension burden over the remainder of surgery from data
-available at the anaesthesia induction anchor.
+**Background:** Intraoperative hypotension is associated with kidney and myocardial injury. Machine-learning performance estimates vary widely. We developed and internally validated a model predicting cumulative hypotension burden over the remainder of surgery from data available at the anaesthesia induction anchor, and examined its transportability in an external cohort.
 
-**Methods:** Retrospective cohort from MOVER/SIS (University of California Irvine; data use
-agreement). Of 19,114 screened records, 16,861 adult cases had a valid anchor (first intubation
-event, 82.1%; otherwise surgery start, 17.9%). The primary outcome required ≥10 mean arterial
-pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. Predictors were truncated at
-the anchor; four models were fitted (baseline, full logistic, XGBoost, LightGBM). Validation used
-patient-level (primary) and temporal (secondary) splits; the unchanged MOVER core model was also
-applied to the VitalDB arterial cohort (n = 3,735; anchor adapted from intubation to operation
-start; no refitting). AUPRC was the primary metric; AUROC, Brier and 1,000 bootstrap confidence
-intervals were secondary; out-of-fold isotonic calibration and decision curve analysis were performed.
+**Methods:** Retrospective cohort from MOVER/SIS. Of 19,114 screened records, 16,861 adult cases had a valid anchor (first intubation event, 82.0%; otherwise surgery start, 18.0%). The primary outcome required ≥10 mean arterial pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. Predictors were truncated at the anchor; four models were fitted (baseline, full logistic, XGBoost, LightGBM). Validation used patient-level (primary) and temporal (secondary) splits; the unchanged MOVER core model was also applied to the VitalDB arterial cohort (n = 3,735; anchor adapted from intubation to operation start; no refitting) as a transportability check. AUPRC was the primary metric; AUROC and Brier score were secondary; 95% confidence intervals came from 1,000 bootstrap resamples; isotonic calibration and decision curve analysis were performed.
 
-**Results:** The outcome occurred in 2,622 of 16,861 cases (15.55%). XGBoost achieved AUPRC 0.347
-(95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split, versus 0.234
-(baseline), 0.301 (full logistic) and 0.337 (LightGBM); on the temporal split it achieved 0.339
-(0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191
-to 0.119. Performance was higher in women and younger patients; pre-anchor mean MAP was the dominant
-predictor. Externally (VitalDB, prevalence 5.7%), the unchanged model retained discrimination
-(AUROC 0.751, 95% CI 0.713–0.784; AUPRC 0.160, 0.129–0.202) but probabilities were uncalibrated;
-for the 53-feature model internal AUROC was 0.698–0.710, and because the external anchor
-(operation start) postdates induction, this is a transportability check, not a like-for-like
-validation.
+**Results:** The outcome occurred in 2,622 of 16,861 cases (15.55%). XGBoost achieved AUPRC 0.347 (95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split, versus 0.233 (baseline), 0.301 (full logistic) and 0.338 (LightGBM); on the temporal split it achieved 0.339 (0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191 to 0.119. Subgroup AUPRC tracked stratum prevalence; pre-anchor mean MAP was the dominant predictor. Externally (VitalDB, prevalence 5.73%), the unchanged model retained discrimination (AUROC 0.744, 95% CI 0.705–0.778; AUPRC 0.158, 0.126–0.202) but probabilities were uncalibrated; the 53-feature internal AUROC was 0.698–0.710, confirming transportability rather than like-for-like validation.
 
-**Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest
-but non-null discrimination for cumulative hypotension burden and was well calibrated. External
-validation confirmed transfer of discrimination but not of absolute probabilities, requiring
-local recalibration before clinical use.
+**Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest but non-null discrimination for cumulative hypotension burden and was well calibrated. An external transportability check in VitalDB supported transfer of ranking but not of absolute probabilities, requiring local recalibration before clinical use.
 
-**Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean
-arterial pressure; perioperative medicine; calibration; TRIPOD
-
----
+**Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean arterial pressure; perioperative medicine; calibration; TRIPOD
 
 ## Background
 
@@ -77,7 +50,8 @@ Second, some reported performances are difficult to reconcile with the informati
 data. Applying gradient-boosted trees to the same public resource used here, a recent preprint
 reported near-perfect discrimination for short-horizon prediction (AUROC 0.973, accuracy 0.942)
 [4]. In the component of that resource analysed here, non-invasive MAP is recorded in 19.89% of
-case-minutes and 96.2% of non-empty recording segments are isolated single minutes. Under such
+vital-sign rows (about one in five) and 96.2% of non-empty recording segments are isolated single
+minutes. Under such
 sparsity, discrimination of that magnitude is difficult to attribute to physiological signal.
 A cross-centre evaluation reached a closely related conclusion, showing that apparent advantage
 of deep-learning models over simple threshold rules largely disappears once cases already
@@ -85,11 +59,11 @@ hypotensive at the prediction origin are excluded and the grey zone is retained 
 scoping review of perioperative artificial intelligence found external validation and
 bias-resistant evaluation to be uncommon [6].
 
-We therefore set out to develop and validate (internally and externally) a model for the *cumulative burden* of
+We therefore set out to develop and internally validate a model for the *cumulative burden* of
 hypotension over the remainder of surgery, using only information available at the anaesthesia
-induction anchor, and to report it under an explicit leakage audit, with calibration and
-decision-analytic evaluation, and with an honest account of what the recording density of the
-source data permits.
+induction anchor, to examine its transportability in an independent external cohort, and to report
+it under an explicit leakage audit, with calibration and decision-analytic evaluation, and with an
+honest account of what the recording density of the source data permits.
 
 ## Methods
 
@@ -109,27 +83,33 @@ recruited and no intervention was performed.
 
 Records were screened and excluded as follows (Figure 1): 8 records with implausible operating
 room (OR) windows (4 with non-positive duration, 4 exceeding 1,440 minutes; maximum observed
-3,156,668 minutes, indicating corrupt timestamps); 1,632 records with an OR window shorter than
-60 minutes; and 371 records of patients younger than 18 years. This left 17,103 cases. A further
-242 cases were excluded because no valid prediction anchor could be determined (anchor falling
-outside the OR window), yielding an analysis cohort of **16,861** cases contributing 3,559,993
-one-minute OR observations. Median OR duration was 167 minutes.
+3,156,668 minutes, indicating corrupt timestamps); 1,632 records with fewer than 60 vital-sign
+observations inside the OR window; and 371 records of patients younger than 18 years. This left
+17,103 cases. A further 242 cases were excluded because no valid prediction anchor could be
+determined (anchor falling outside the OR window), yielding an analysis cohort of **16,861** cases
+contributing 3,379,173 OR-window vital-sign observations. Median OR duration was 167 minutes.
 
 ### Prediction anchor
 
-The prediction anchor was the first recorded Intubation event (n = 13,834; 82.1%). Where no
-intubation event existed, Surgery start was used as a proxy (n = 3,027; 17.9%). The anchor occurred
+The prediction anchor was the first recorded Intubation event (n = 13,834; 82.0%). Where no
+intubation event existed, Surgery start was used as a proxy (n = 3,027; 18.0%). The anchor occurred
 a median of 15 minutes (IQR 11–24) after OR start. The observation window after the anchor had a
 median duration of 147 minutes (5th–95th percentile 49–440).
 
 ### Outcome
 
-The primary outcome (D1) was a cumulative-burden definition that adopts the absolute MAP
-threshold (<65 mmHg) of Salmasi et al. [1] but operationalises burden as at least 10 MAP
-measurements after the anchor, of which at least 30% were below threshold; the ≥10-measurement and
-≥30%-below rule is our operational choice rather than a literal transcription of that report. Cases with fewer than 10 post-anchor measurements were classified as
-negative by construction; this applied to 1,496 cases (8.9%), because the definition deliberately
-requires a minimum amount of evidence before a burden can be asserted.
+The primary outcome (D1) adopts the absolute MAP threshold (<65 mmHg) of Salmasi et al. [1] but
+operationalises burden as the proportion of *recorded* post-anchor MAP readings below threshold: at
+least 10 readings, of which at least 30% below 65 mmHg. Because non-invasive pressure is recorded
+intermittently rather than continuously, this is a proportion of recorded readings, not a
+cumulative time below threshold; the number of low readings required for a positive label therefore
+varies with recording density (3 to 77 readings across cases; median 9). The ≥10-measurement and
+≥30%-below rule is our operational choice rather than a literal transcription of that report. Cases
+with fewer than 10 post-anchor measurements were classified as negative by construction; this
+applied to 1,496 cases (8.9%) — 1,332 with 1–9 readings and 164 with no post-anchor MAP recording
+at all — because the definition deliberately requires a minimum amount of evidence before a burden
+can be asserted. A sensitivity analysis restricted to the 15,365 evaluable cases is reported in the
+Results.
 
 Because the choice of hypotension definition materially changes apparent performance, 14 candidate
 definitions were computed for every case and are reported in full (Table 2; their prevalence is shown in Figure 2). They comprise
@@ -153,11 +133,17 @@ origin could enter the model. Physiological and device domains were additionally
 and fluid records were restricted to those started before the anchor. The integrity of this
 truncation was verified programmatically and reported as a leakage audit (Table 3): across all
 seven time-stamped domains the maximum interval between any used observation and the anchor was
-0.00 minutes, and no record had an unparseable timestamp.
+0.00 minutes, and no record had an unparseable timestamp. One boundary detail deserves statement:
+the physiological windows are closed at the anchor ([anchor−15, anchor]), so a MAP reading recorded
+exactly at the anchor minute belongs to both the feature window and the outcome window
+([anchor, OR end]). Sensitivity analyses that exclude the anchor minute from the feature window,
+and separately from the outcome window, are reported in the Results; neither changed the
+conclusions.
 
 Surgical group was assigned from the free-text procedure description by keyword mapping into 12
-categories with a controlled fuzzy fallback (edit distance ≤1, identical initial, minimum length
-7 characters). The residual "other" category contained 348 cases (2.1%).
+surgical categories plus a no-surgery category, with a controlled fuzzy fallback (edit distance ≤1,
+identical initial, minimum length 7 characters). The residual "other" category contained 348 cases
+(2.1%).
 
 Anthropometric variables required cleaning. Height and weight in the source contained unit-entry
 errors (observed height as low as 2 cm, weight as high as 839 kg), which propagated to body mass
@@ -170,11 +156,16 @@ heights, 18 weights and 6 BMI values were affected, leaving BMI computable for 1
 
 Four models were pre-specified. A *baseline* logistic model used age, sex and BMI only, to
 quantify how much the full predictor set adds. A *full* logistic model used all predictors after
-median imputation with missingness indicators and standardisation, with balanced class weighting.
-*XGBoost* (300 trees, depth 4, learning rate 0.05, subsample 0.8, column sampling 0.8, minimum
-child weight 10, L2 penalty 1.0, class-weight scaling) and *LightGBM* (300 trees, 15 leaves,
-learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 samples per leaf, L2 penalty
-1.0, balanced class weighting) used native handling of missing values and required no imputation.
+median imputation with missingness indicators and standardisation, with balanced class weighting;
+the imputer was fitted within each training fold only, so no test-set information entered
+preprocessing. *XGBoost* (300 trees, depth 4, learning rate 0.05, subsample 0.8, column sampling
+0.8, minimum child weight 10, L2 penalty 1.0, class-weight scaling) and *LightGBM* (300 trees, 15
+leaves, learning rate 0.05, subsample 0.8, column sampling 0.8, minimum 20 samples per leaf, L2
+penalty 1.0, balanced class weighting) used native handling of missing values and required no
+imputation. Hyperparameters were fixed a priori on clinical-iterative grounds rather than by
+external tuning; with 335 logistic parameters against 2,097 training events (events per variable
+≈6.3), the full logistic model is expected to be over-fitted and is reported as a comparator
+rather than a deployable model.
 
 ### External validation cohort
 
@@ -186,9 +177,16 @@ transparency limitation must be stated at the outset: VitalDB records no intubat
 prediction anchor was adapted from the MOVER intubation (induction) anchor to the operation start
 time (opstart), which occurs *after* induction and intubation. The external "pre-anchor" 15-minute
 window therefore captures early-intraoperative rather than pre-induction physiology, a different
-phase from the development window. The outcome D1 was computed identically over [opstart, opend]. Of
-6,388 VitalDB cases, 3,735 had both valid opstart/opend times and an arterial mean arterial pressure
-track (Solar8000/ART_MBP or EV1000/ART_MBP) and formed the external cohort. Predictors were
+phase from the development window. The outcome D1 was computed by the same rule over
+[opstart, opend]; because VitalDB samples arterial pressure far more densely than the intermittent
+non-invasive readings in MOVER, the same proportion-based rule implies a much larger absolute
+hypotensive exposure for a positive external label (at the median recording density, about 1,300
+hypotensive samples, or some 44 cumulative minutes below 65 mmHg, versus 9 readings in MOVER), so
+the external endpoint is not equivalent to the development endpoint and part of the prevalence gap
+between cohorts is definitional rather than case-mix; a sensitivity analysis on a common
+one-minute-grid, absolute-time definition is reported in the Results. Of 6,388 VitalDB cases with
+recorded vital signs, 3,735 had an arterial MAP track (Solar8000/ART_MBP or EV1000/ART_MBP) together
+with valid operation timing and formed the external cohort. Predictors were
 restricted to the 53-feature transportable subset: demographic and anthropometric variables;
 pre-anchor 15-minute summary statistics of six vital signs (MAP, SBP, DBP, HR, a heart-rate
 variability proxy and SpO₂); the fraction of pre-anchor MAP readings below 65 and 55 mmHg; and three
@@ -197,7 +195,11 @@ was an intubation event, and a calendar-year indicator. The latter two are not d
 VitalDB and were set to zero; the anchor-to-OR-start interval was re-derived under the opstart anchor
 (opstart minus case start, in minutes), so its meaning necessarily differs from the development
 cohort, where it is the OR-start-to-intubation interval — a residual source of transportability
-error. The MOVER core model (53 features, seed 12,345) was applied without any external refitting or
+error. For transparency we note that the transported model was fitted on the full MOVER cohort
+(all 16,861 cases), whereas the internal comparators in Table 7 were fitted on the 80% training
+split of the patient-level split; the external model is therefore not disadvantaged by a smaller
+training set, but neither is it directly comparable to the held-out internal estimates. The MOVER
+core model (53 features, seed 12,345) was applied without any external refitting or
 recalibration; performance was summarised by AUPRC (primary), AUROC and Brier score, with 95%
 confidence intervals from 1,000 bootstrap resamples. Calibration was assessed descriptively and was
 not updated on the external data.
@@ -214,19 +216,22 @@ no skill attains AUPRC equal to the prevalence. AUROC and Brier score were secon
 intervals came from 1,000 bootstrap resamples of the test set. Calibration was assessed and, for
 the primary model, improved by isotonic regression fitted on out-of-fold predictions from a
 5-fold cross-validation within the training data, then applied unchanged to the test set.
-Calibration slope and intercept were reported. Decision curve analysis quantified net benefit
-across threshold probabilities.
+Calibration slope and intercept were reported on both the probability scale (linear-probability
+model) and the log-odds scale (logistic recalibration). Decision curve analysis quantified net
+benefit across threshold probabilities.
 
 Predictor importance was reported as XGBoost gain. Because gain reflects the fitted model rather
 than an inferential quantity, it is presented descriptively.
 
 ### Software and reproducibility
 
-Analyses used Python 3.13 with pandas 2.3.3, scikit-learn 1.9.0, XGBoost 3.4.1 and LightGBM 4.7.0.
-The random seed was fixed at 12,345. Every number reported in this manuscript is generated from a
-result file by the analysis pipeline and is traceable through an audit trail (Additional file 1)
-that records, for each quantity, its value, the producing artefact and the command that
-reproduces it [10–12].
+Analyses used Python 3.13 with pandas 2.3.3, scikit-learn 1.9.0 [9], XGBoost 3.4.1 [10] and
+LightGBM 4.7.0 [11]. The random seed was fixed at 12,345. Every headline number reported in this
+manuscript is generated from a result file by the analysis pipeline and is traceable through an
+audit trail (Additional file 1) that records, for each quantity, its value, the producing artefact
+and the command that reproduces it; a small number of descriptive statistics (for example the
+interquartile ranges of recording density) are produced by the same scripts and are listed in the
+trail with their source artefact but without a dedicated reproduce command.
 
 ## Results
 
@@ -250,8 +255,8 @@ lower pre-anchor mean MAP (79.5 vs 89.0 mmHg) and lower pre-anchor minimum MAP (
 | Height, cm — median (IQR) | 167 (160–175) |
 | Weight, kg — median (IQR) | 76 (63–90) |
 | Body mass index, kg/m² — median (IQR) | 26.6 (23.1–30.9) |
-| Anchor = Intubation — n (%) | 13,834 (82.1) |
-| Anchor = Surgery start (proxy) — n (%) | 3,027 (17.9) |
+| Anchor = Intubation — n (%) | 13,834 (82.0) |
+| Anchor = Surgery start (proxy) — n (%) | 3,027 (18.0) |
 | Anchor after OR start, min — median (IQR) | 15 (11–24) |
 | Post-anchor window, min — median (5th–95th) | 147 (49–440) |
 | Pre-anchor MAP readings in 15-min window — median (IQR) | 3 (2–4) |
@@ -345,8 +350,8 @@ unparseable timestamps).
 
 On the primary patient-level split, XGBoost gave the highest AUPRC at 0.347 (95% CI 0.309–0.387),
 which is 2.23 times the prevalence of 0.1555 expected under no skill (Table 4). LightGBM was
-similar on AUROC (0.724 vs 0.722) but slightly lower on AUPRC. The full logistic model reached
-AUPRC 0.301, and the age/sex/BMI baseline 0.234, indicating that the additional predictors
+similar on AUROC (0.721 vs 0.722) but slightly lower on AUPRC. The full logistic model reached
+AUPRC 0.301, and the age/sex/BMI baseline 0.233, indicating that the additional predictors
 contribute meaningfully beyond basic demographics while the absolute gain remains moderate. Figure 3 shows the precision–recall and receiver operating characteristic curves for all four models.
 
 Results on the temporal split were closely similar (XGBoost AUPRC 0.339, AUROC 0.733), indicating
@@ -356,14 +361,14 @@ no material calendar-time drift.
 
 | Split | Model | n train | n test | Events in test | AUPRC (95% CI) | AUROC (95% CI) | Brier |
 |---|---|---|---|---|---|---|---|
-| Patient | Baseline logistic (age, sex, BMI) | 13,488 | 3,373 | 525 | 0.234 (0.207–0.268) | 0.626 (0.597–0.653) | 0.239 |
-| Patient | Full logistic | 13,488 | 3,373 | 525 | 0.301 (0.268–0.340) | 0.707 (0.682–0.729) | 0.216 |
+| Patient | Baseline logistic (age, sex, BMI) | 13,488 | 3,373 | 525 | 0.233 (0.205–0.267) | 0.624 (0.596–0.650) | 0.239 |
+| Patient | Full logistic | 13,488 | 3,373 | 525 | 0.301 (0.269–0.339) | 0.706 (0.681–0.728) | 0.216 |
 | Patient | **XGBoost** | 13,488 | 3,373 | 525 | **0.347 (0.309–0.387)** | **0.722 (0.697–0.745)** | 0.191 |
-| Patient | LightGBM | 13,488 | 3,373 | 525 | 0.337 (0.301–0.375) | 0.724 (0.699–0.745) | 0.183 |
-| Temporal | Baseline logistic | 15,043 | 1,818 | 291 | 0.243 (0.209–0.288) | 0.609 (0.574–0.646) | 0.240 |
-| Temporal | Full logistic | 15,043 | 1,818 | 291 | 0.336 (0.289–0.394) | 0.725 (0.693–0.757) | 0.227 |
+| Patient | LightGBM | 13,488 | 3,373 | 525 | 0.338 (0.299–0.377) | 0.721 (0.697–0.743) | 0.183 |
+| Temporal | Baseline logistic | 15,043 | 1,818 | 291 | 0.243 (0.209–0.288) | 0.609 (0.574–0.646) | 0.239 |
+| Temporal | Full logistic | 15,043 | 1,818 | 291 | 0.336 (0.289–0.394) | 0.726 (0.694–0.758) | 0.226 |
 | Temporal | **XGBoost** | 15,043 | 1,818 | 291 | **0.339 (0.291–0.395)** | **0.733 (0.703–0.762)** | 0.194 |
-| Temporal | LightGBM | 15,043 | 1,818 | 291 | 0.337 (0.290–0.392) | 0.732 (0.703–0.761) | 0.188 |
+| Temporal | LightGBM | 15,043 | 1,818 | 291 | 0.336 (0.289–0.390) | 0.731 (0.702–0.761) | 0.188 |
 
 AUPRC under no skill equals the prevalence (0.1555). Brier scores are for uncalibrated predictions.
 
@@ -373,48 +378,64 @@ For XGBoost on the patient-level split, the uncalibrated Brier score was 0.191, 
 no-information Brier score of 0.131 (prevalence × (1 − prevalence)); this confirms meaningful
 miscalibration for which recalibration was required rather than cosmetic. Out-of-fold isotonic
 recalibration reduced the Brier score to 0.119, with a calibration slope of 0.909 and an intercept
-of 0.008, indicating well-calibrated probabilities on the log-odds scale. On the temporal split the
-Brier score improved from 0.194 to 0.122, with slope 0.934 and intercept 0.006.
+of 0.008 on the probability scale (linear-probability model); the logit-scale recalibration slope
+and intercept are reported alongside. On the temporal split the Brier score
+improved from 0.194 to 0.122, with slope 0.934 and intercept 0.006 on the probability scale. In
+both cases the probability-scale slope below 1 indicates that the uncalibrated predictions were
+slightly over-dispersed, which isotonic recalibration corrected.
 
 In decision curve analysis, the calibrated model's net benefit exceeded that of the "treat none"
-strategy at low-to-moderate thresholds, remaining positive up to approximately 0.58 on the
-patient-level split and 0.46 on the temporal split; on the temporal split it then became negative
-between roughly 0.46 and 0.66 and returned briefly to positive only between approximately 0.66 and
-0.74 before turning negative again. The "treat all" strategy had a small positive net benefit at the
-lowest evaluated thresholds (≈0.06 at threshold 0.10) but became strongly negative at higher
-thresholds (≈−2.1 at 0.73), so it offers no advantage over the model. The absolute net benefit at the decision-relevant thresholds
-was small (e.g., 0.050 and 0.058 at 0.15 on the two splits, and 0.079 and 0.085 at 0.10), so the
-clinical usefulness demonstrated by the curve is modest. At a threshold of 0.15, close to the
-outcome prevalence, net benefit was 0.050 and 0.058 respectively; at a threshold of 0.10 it was
-0.079 and 0.085. In a benchmark against a logistic model using the pre-anchor mean MAP alone, the
-full model's incremental net benefit was 0.013 at both thresholds 0.10 and 0.15 (Figure 4).
+strategy from the lowest evaluated threshold up to 0.58 on the patient-level split and up to 0.45
+on the temporal split; on the temporal split it then turned negative between 0.46 and 0.65 and
+returned briefly to positive only between 0.66 and 0.73, where the net benefit was nonetheless
+negligible (≤0.0006), as it was at the top of the patient-level range (0.0001 at 0.58). The "treat
+all" strategy had a small positive net benefit at the lowest evaluated thresholds (≈0.06 at
+threshold 0.10) but became strongly negative at higher thresholds (≈−2.1 at 0.73), so it offers no
+advantage over the model. The absolute net benefit at the decision-relevant thresholds was small
+(0.078 and 0.085 at threshold 0.10; 0.051 and 0.058 at threshold 0.15, close to the outcome
+prevalence), so the clinical usefulness demonstrated by the curve is modest. In a benchmark
+against a logistic model using the pre-anchor mean MAP alone, the full model's incremental net
+benefit was 0.013 at both thresholds 0.10 and 0.15 (Figure 4).
 
 ### Subgroup performance
 
-Performance varied systematically (Table 5). AUPRC was higher in women than men, declined
-monotonically with age, and was highest in underweight patients. These patterns were reproduced on
-the temporal split for sex and age. The underweight subgroup was an exception: AUPRC was 0.616 on
-the patient-level split but 0.382 on the temporal split, and with only 98 cases in the patient-level test-set stratum (512 in the full cohort)
-the estimate should be regarded as unstable.
+Raw subgroup AUPRC varied across strata (Table 5): it was higher in women than men, declined with
+age, and was highest in underweight patients. However, subgroup AUPRC tracks stratum outcome
+prevalence closely: across the nine strata the rank correlation between full-cohort stratum
+prevalence and patient-level subgroup AUPRC was strong (Spearman ρ = 0.88, p = 0.002). Normalising
+AUPRC by stratum prevalence (the no-skill AUPRC for that stratum) compressed the age gradient to
+ratios of 1.89, 2.28 and 1.82 across increasing age bands and reversed the sex ordering (men 2.17
+vs women 2.07); on the temporal split the normalised ratios were similarly uniform (1.88–2.14 by
+age band; women 2.14 vs men 1.93). The raw subgroup differences therefore largely reflect stratum
+base rates rather than differential model skill, and no subgroup-specific claim is made. The
+underweight stratum is the clearest exception and is explicitly unstable: its raw AUPRC of 0.616
+rests on 10 outcome events among 98 patient-level test-set cases (512 cases, 95 events in the full
+cohort), and the corresponding ratio of 3.32 is inflated by the same small numbers; on the temporal
+split the AUPRC fell to 0.382.
 
-**Table 5. AUPRC of XGBoost by subgroup (held-out test set).**
+**Table 5. AUPRC of XGBoost by subgroup (held-out test set), with stratum prevalence and the
+AUPRC-to-prevalence ratio (lift over the no-skill baseline).**
 
-| Subgroup | n (test) | Patient split | Temporal split |
-|---|---|---|---|
-| Men | 1,689 | 0.299 | 0.267 |
-| Women | 1,684 | 0.357 | 0.370 |
-| Age < 50 years | 1,402 | 0.380 | 0.377 |
-| Age 50–64 years | 1,044 | 0.324 | 0.305 |
-| Age ≥ 65 years | 927 | 0.186 | 0.194 |
-| BMI < 18.5 kg/m² | 98 | 0.616 | 0.382 |
-| BMI 18.5–24.9 kg/m² | 1,202 | 0.392 | 0.354 |
-| BMI 25–29.9 kg/m² | 1,064 | 0.286 | 0.306 |
-| BMI ≥ 30 kg/m² | 977 | 0.257 | 0.330 |
+| Subgroup | n (test) | Stratum prevalence, % (full cohort) | Patient AUPRC | AUPRC / prevalence | Temporal AUPRC | AUPRC / prevalence |
+|---|---|---|---|---|---|---|
+| Men | 1,689 | 13.80 | 0.299 | 2.17 | 0.267 | 1.93 |
+| Women | 1,684 | 17.27 | 0.357 | 2.07 | 0.370 | 2.14 |
+| Age < 50 years | 1,402 | 20.09 | 0.380 | 1.89 | 0.377 | 1.88 |
+| Age 50–64 years | 1,044 | 14.26 | 0.324 | 2.28 | 0.305 | 2.14 |
+| Age ≥ 65 years | 927 | 10.22 | 0.186 | 1.82 | 0.194 | 1.90 |
+| BMI < 18.5 kg/m² | 98 | 18.55 | 0.616 | 3.32 | 0.382 | 2.06 |
+| BMI 18.5–24.9 kg/m² | 1,202 | 18.76 | 0.392 | 2.09 | 0.354 | 1.89 |
+| BMI 25–29.9 kg/m² | 1,064 | 14.55 | 0.286 | 1.96 | 0.306 | 2.10 |
+| BMI ≥ 30 kg/m² | 977 | 12.45 | 0.257 | 2.07 | 0.330 | 2.65 |
 
 n denotes the number of cases in the held-out test set on which each subgroup AUPRC was computed
-(patient-level split: 3,373; temporal split: 1,818). Subgroup AUPRCs are exploratory given the
-reduced event counts within strata; for example, the underweight stratum comprised 98
-patient-level test-set cases (512 in the full cohort).
+(patient-level split: 3,373; temporal split: 1,818). Stratum prevalence is the D1 prevalence of the
+stratum in the full analysis cohort (n = 16,861), which estimates the stratum base rate more
+stably than the smaller held-out sets; under no skill the AUPRC of a stratum equals its prevalence,
+so the ratio is the lift over that baseline. Subgroup AUPRCs are exploratory given the reduced
+event counts within strata: for example, the underweight stratum comprised 98 patient-level
+test-set cases with 10 events (512 cases with 95 events in the full cohort). Thirty-two test-set
+cases had missing BMI and contribute to no BMI stratum.
 
 ### Predictor importance
 
@@ -439,18 +460,18 @@ pressure summaries. Figure 5 shows the 25 highest-gain predictors.
 | 9 | Minimum invasive diastolic pressure | Invasive monitoring | 44.7 |
 | 10 | Mean invasive MAP | Invasive monitoring | 43.2 |
 
-### External validation
+### External transportability check
 
 The MOVER core model was applied without refitting to the VitalDB arterial cohort of 3,735 eligible
 cases (of 6,388 VitalDB cases with recorded vital signs, those with valid operation timing and an
 arterial MAP track), of which 214 (5.73%) met the D1 outcome (Table 7); a further 214 cases with
 fewer than 10 post-anchor MAP measurements were classified D1-negative by construction under the
 same rule as the development cohort, so the conditional prevalence among adequately monitored
-external cases was 6.1% (214 of 3,521). Discrimination transferred: the external AUROC was 0.751
-(95% CI 0.713–0.784), numerically above the internal patient-level value of 0.698 and the temporal
+external cases was 6.1% (214 of 3,521). Discrimination transferred: the external AUROC was 0.744
+(95% CI 0.705–0.778), numerically above the internal patient-level value of 0.698 and the temporal
 value of 0.710 for the same 53-feature model, although the confidence intervals overlap
-(0.713–0.784 vs 0.673–0.723 and 0.679–0.740), so the difference should be read as consistency
-rather than superiority. The external AUPRC of 0.160 (0.129–0.202) exceeded the external prevalence
+(0.705–0.778 vs 0.673–0.723 and 0.679–0.740), so the difference should be read as consistency
+rather than superiority. The external AUPRC of 0.158 (0.126–0.202) exceeded the external prevalence
 by a factor of 2.8, a larger relative lift than the 2.1-fold internal value for that model. The
 lower absolute AUPRC reflects the much lower external prevalence (5.73% vs 15.55%) rather than a
 loss of ranking ability. Absolute probabilities did not transfer: the mean predicted risk was 0.37
@@ -458,18 +479,49 @@ against an observed prevalence of 0.057 (external Brier score 0.179), indicating
 would require local recalibration before the predicted probabilities could be used directly. These
 results are summarised in Figure 6 and Table 7.
 
-**Table 7. External validation of the MOVER core model (53 features) in VitalDB versus internal
-performance of the same model in MOVER/SIS.**
+**Table 7. External transportability check of the MOVER core model (53 features) in VitalDB versus
+internal performance of the same model in MOVER/SIS.**
 
 | Dataset | Split | n | Events | Prevalence (%) | AUPRC (95% CI) | AUROC (95% CI) | Brier |
 |---|---|---|---|---|---|---|---|
 | MOVER/SIS (development) | Patient | 3,373 | 525 | 15.55 | 0.321 (0.284–0.362) | 0.698 (0.673–0.723) | 0.198 |
-| MOVER/SIS (development) | Temporal | 1,818 | 291 | 15.55 | 0.314 (0.269–0.365) | 0.710 (0.679–0.740) | 0.199 |
-| VitalDB (external) | — | 3,735 | 214 | 5.73 | 0.160 (0.129–0.202) | 0.751 (0.713–0.784) | 0.179 |
+| MOVER/SIS (development) | Temporal | 1,818 | 291 | 16.01 | 0.314 (0.269–0.365) | 0.710 (0.679–0.740) | 0.199 |
+| VitalDB (external) | — | 3,735 | 214 | 5.73 | 0.158 (0.126–0.202) | 0.744 (0.705–0.778) | 0.179 |
 
 Internal values are for the identical 53-feature transportable model; the development manuscript
 headline (AUPRC 0.347, AUROC 0.722) is for the full 206-feature model. The external cohort had no
 refitting or recalibration.
+
+### Sensitivity analyses
+
+We examined the robustness of the main findings to eight perturbations; the key results are in Table 8.
+
+**S1 – Restricted evaluable cohort.** Excluding the 1,496 negative-by-construction (NBC) cases left 15,365 cases with at least 10 post-anchor MAP measurements (conditional prevalence 17.06%). On this subset XGBoost reached AUPRC 0.401 (95% CI 0.358–0.444) and AUROC 0.735 (0.710–0.757) on the patient-level split and AUPRC 0.367 (0.318–0.425) and AUROC 0.739 (0.709–0.769) on the temporal split – higher than the full-cohort values, confirming that the apparent precision gain reflects removal of the NBC cases rather than stronger physiological signal.
+
+**S2 – Half-open anchor window.** Repeating the main analysis with the anchor minute excluded from the feature window (strict `<anchor`) gave patient-level AUPRC 0.342 (0.302–0.380) and AUROC 0.715 (0.690–0.737) and temporal AUPRC 0.334 (0.286–0.388) and AUROC 0.723 (0.693–0.753), essentially unchanged from the closed-window main results, so inclusion of the anchor minute does not drive the findings.
+
+**S3 – Externally re-derived time-based labels.** Recomputing the external D1 outcome on VitalDB on a common one-minute grid with absolute-time thresholds (already-transported 53-feature model, unrefitted) yielded AUROC 0.744 (0.705–0.778) and AUPRC 0.158 (0.126–0.202) under the sampling-based definition (D1_samples, prevalence 5.73%) – numerically consistent with the development-label external value, confirming the transportability signal is not an artefact of the development label rule.
+
+**S4 – External recalibration.** Fitting a logistic recalibration to the transported predictions on VitalDB (logit-scale slope 0.77, intercept -2.61; calibration-in-the-large 0.30) shifted the mean predicted risk from 0.36 towards the observed prevalence of 0.057 and improved the Brier score, demonstrating that local recalibration restores probability accuracy.
+
+**S5 – External funnel.** Of 6,388 VitalDB cases with recorded vitals, 3,735 had a valid arterial MAP track and operation timing; 214 had zero post-anchor MAP and were negative by construction, coinciding exactly with the 214 D1-positive cases (disclosed for transparency).
+
+**S6 – Physiological-feature subset.** Restricting the transported model to the 39 physiological value-domain features (dropping cadence counters and the frozen context features) gave external AUROC 0.713 (0.670–0.750) and AUPRC 0.151 (0.119–0.196) – only marginally below the 53-feature value, so the dropped features contributed little.
+
+**S7 – Anchor-minute label overlap.** In the primary design both windows are closed at the anchor (the feature window `[anchor-15, anchor]` and the label window `[anchor, OR_end]` share the anchor minute); 99.0% of cases have a MAP reading exactly at the anchor. Re-deriving labels with the strictly open label window `(anchor, OR_end]` flipped only 62 positive to negative and 35 negative to positive (net -27; prevalence 15.39% vs 15.55%), confirming the anchor minute belongs to the feature side and its shared inclusion does not materially affect labels.
+
+**S8 – Case-minute recording rate.** The fraction of surgical minutes with at least one recorded MAP (case-minute recording rate) was 19.6%, corroborating the 19.89% row-level MAP density and the sparse-sampling limitation in Limitation 9.
+
+**Table 8. Sensitivity analyses of the MOVER/SIS hypotension model (XGBoost unless noted).**
+
+| Analysis | Split | n | Prevalence (%) | AUPRC (95% CI) | AUROC (95% CI) |
+|---|---|---:|---:|---:|---:|
+| S1 Restricted cohort | Patient | 15,365 | 17.06 | 0.401 (0.358–0.444) | 0.735 (0.710–0.757) |
+| S1 Restricted cohort | Temporal | 15,365 | 17.06 | 0.367 (0.318–0.425) | 0.739 (0.709–0.769) |
+| S2 Half-open window | Patient | 16,861 | 15.55 | 0.342 (0.302–0.380) | 0.715 (0.690–0.737) |
+| S2 Half-open window | Temporal | 16,861 | 15.55 | 0.334 (0.286–0.388) | 0.723 (0.693–0.753) |
+| S3 External labels (D1_samples) | - | 3,735 | 5.73 | 0.158 (0.126–0.202) | 0.744 (0.705–0.778) |
+| S6 Physiological subset (external) | - | 3,735 | 5.73 | 0.151 (0.119–0.196) | 0.713 (0.670–0.750) |
 
 ## Discussion
 
@@ -482,9 +534,10 @@ under temporal validation and good calibration after isotonic recalibration. Dis
 therefore approximately 2.2-fold (2.23×) better than the no-skill baseline on the precision–recall
 scale — modest, but clearly not null — and the decision curve showed the model yielded positive net
 benefit relative to both default strategies across threshold probabilities up to approximately 0.58
-(patient-level) and 0.46 (temporal); on the temporal split the net benefit turns negative beyond
-0.46 except for a narrow positive interval near 0.66–0.74. The decision-relevant region is therefore thresholds near to
-moderately above the outcome prevalence (roughly 0.10–0.30), where the calibrated probabilities
+(patient-level) and 0.45 (temporal); on the temporal split the net benefit turns negative beyond
+0.45 except for a narrow positive interval between 0.66 and 0.73, where its magnitude is negligible.
+The decision-relevant region is therefore thresholds near to moderately above the outcome
+prevalence (roughly 0.10–0.30), where the calibrated probabilities
 could support a vasopressor-readiness or enhanced-monitoring decision; the specific operating point
 remains a clinical judgement to be informed by external validation rather than settled here.
 
@@ -500,11 +553,12 @@ distinction matters, because a model whose information content is largely the pr
 pressure adds little to what an anaesthetist already sees, and it is precisely the setting in which
 selection bias can inflate apparent performance [5].
 
-This interpretation is consistent with the stratified findings. Performance declined sharply with
-age, which is the opposite of what a purely risk-factor-based model would predict, and was higher
-in women. Both patterns are compatible with the model tracking pre-anchor pressure levels, whose
-distribution and prognostic weight differ across these strata, rather than with the model
-identifying age- or sex-specific vulnerability.
+This interpretation is consistent with the stratified findings. Raw AUPRC declined with age and was
+higher in women, but both patterns tracked stratum outcome prevalence rather than differential
+model skill: normalising by stratum prevalence reversed the sex ordering and compressed the age
+gradient (Table 5). The patterns remain compatible with the model tracking pre-anchor pressure
+levels, whose distribution and prognostic weight differ across these strata, rather than with the
+model identifying age- or sex-specific vulnerability.
 
 ### Relation to previous work
 
@@ -524,10 +578,12 @@ information for hypotension [12]. Our recording density (median 3 MAP readings i
 pre-anchor window) is too sparse to characterise such dynamics, so our model necessarily leans on
 the static pre-anchor level; this is a limitation of the source data rather than evidence against
 the dynamics signal. Other investigators have developed machine-learning models for intraoperative
-risk from comparable operating-room resources, including external-validation studies [14,15]. We now
-provide such an external validation ourselves, in VitalDB, an independent resource with a different
-recording architecture; the model's ranking ability transferred (external AUROC 0.751, in the same range as
-and overlapping the confidence interval of the internal 0.698–0.710 for the same 53-feature model) while absolute probabilities did not and would
+risk from comparable operating-room resources, including models developed on MOVER itself [13] and
+external-validation studies in related surgical populations [14]. We now
+provide such an external transportability check ourselves, in VitalDB, an independent resource
+with a different recording architecture; the model's ranking ability transferred (external AUROC
+0.744, in the same range as and overlapping the confidence interval of the internal 0.698–0.710 for
+the same 53-feature model) while absolute probabilities did not and would
 require local recalibration — a finding that strengthens rather than weakens the caution above.
 Performance of the order of 0.97 would still require near-separation of the classes, which is
 difficult to reconcile with the recording density reported here, and we flag the possibility of
@@ -571,7 +627,7 @@ signals, rather than in revealing hidden physiology.
    MAP measurements. The external cohort also had a substantially lower outcome prevalence (5.73% vs
    15.55%) and a different recording architecture (continuous arterial pressure rather than
    intermittent non-invasive measurement), so the external AUPRC cannot be compared directly with the
-   internal value; the external AUROC (0.751) indicates that ranking transferred, although its
+   internal value; the external AUROC (0.744) indicates that ranking transferred, although its
    confidence interval overlaps the internal interval. Predicted probabilities were not calibrated to
    the external cohort (mean predicted risk 0.37 vs observed 0.057), so the external result supports
    deployment readiness of the *discrimination* but not of the *probabilities*.
@@ -584,7 +640,7 @@ signals, rather than in revealing hidden physiology.
 4. **No physiological severity or outcome linkage.** ASA physical status was not available, and the
    database contains no postoperative outcomes, so the model could not be linked to acute kidney
    injury, myocardial injury or mortality. The endpoint is a surrogate.
-5. **Anchor proxy and spectrum bias.** In 17.9% of cases the anchor was Surgery start rather than
+5. **Anchor proxy and spectrum bias.** In 18.0% of cases the anchor was Surgery start rather than
    intubation, because no intubation event was recorded. This is not merely a labelling nuisance:
    the anchor source was among the strongest predictors (anchor is intubation ranked third by gain),
    so the proxy cohort — cases without a recorded intubation, which may systematically differ, for
@@ -594,33 +650,62 @@ signals, rather than in revealing hidden physiology.
    available for 14.8%, 28.8%, 0.45% and 16.6% of cases respectively, so the model is driven
    largely by demographics, surgical group, anaesthetic events and non-invasive pressure.
 7. **Structural exclusions and spectrum bias.** 1,496 cases (8.9%) had fewer than 10 post-anchor
-   measurements and were classified as negative by construction. This is a spectrum effect: the
-   excluded cases are exactly those with the sparsest monitoring (typically shorter or less-invasive
-   cases) and are therefore not missing at random. The conditional prevalence among cases with at
-   least 10 measurements was 17.1% (2,622 of 15,365), and excluding the sparse-monitoring cases may
-   attenuate apparent performance. Anthropometric cleaning set 37 heights, 18 weights and 6 BMI
+   measurements and were classified as negative by construction — 1,332 with 1–9 readings and 164
+   with no post-anchor MAP recording at all. This is a spectrum effect: the
+   excluded cases are exactly those with the sparsest monitoring, and they are therefore not missing
+   at random. A visible proxy confirms the mechanism: 42.9% of the excluded cases had a
+   Surgery-start anchor versus 18.0% overall, and the anchor-source indicator is among the
+   strongest predictors, so the model can score these cases low for reasons unrelated to
+   physiology. The conditional prevalence among cases with at least 10 measurements was 17.1%
+   (2,622 of 15,365); a sensitivity analysis restricted to those 15,365 evaluable cases is reported
+   in the Results and shows that XGBoost discrimination improved to AUPRC 0.401 (95% CI 0.358–0.444) and AUROC 0.735 (0.710–0.757) – an apparent gain driven by removal of the negative-by-construction cases rather than by added physiological signal. Anthropometric cleaning set 37 heights, 18 weights and 6 BMI
    values to missing.
 8. **Single author, no preregistration.** The analysis protocol was fixed before modelling but was
    not publicly registered. Predictor importance is descriptive and should not be read as inference.
-9. **Outcome-label validity under sparse sampling.** D1 is an exposure-fraction definition that treats each recorded MAP as representative of the true intraoperative pressure; under the observed 19.89% recording density, with 96.2% of non-null segments consisting of isolated single minutes, recorded MAP is not a random sample of the surgical period. Cases monitored only during stable intervals could be under-counted as burden-free, so the reported prevalence and performance may be sensitive to which minutes were recorded. We state this as a structural limitation of deriving burden from intermittent non-invasive measurement rather than continuous arterial pressure.
-10. **External discrimination may be inflated by recording density.** VitalDB records continuous arterial pressure, which both defines the outcome and supplies the MAP predictors far more densely and cleanly than the intermittent non-invasive measurement in MOVER/SIS; blood-pressure autocorrelation under dense sampling can inflate apparent ranking discrimination relative to the development cohort. The external AUROC of 0.751 should therefore be read as evidence that ranking transferred under a denser measurement regime, not as evidence of intrinsically better discrimination than the development cohort.
-   pre-anchor MAP level, and the next strongest predictors are the maximum pre-anchor MAP and the
-   fraction of pre-anchor readings already below 65 mmHg. The model therefore largely extrapolates
-   the patient's current pressure rather than discovering independent risk, and adds limited
-   information beyond what a clinician reading the bedside monitor already has; a decision-curve
-   benchmark against a MAP-only logistic model showed the full model's incremental net benefit was
-   only 0.013 at threshold 0.15 (Figure 4).
+9. **Outcome-label validity under sparse sampling.** D1 is an exposure-fraction definition that treats each recorded MAP as representative of the true intraoperative pressure; under the observed 19.89% row-level recording density (case-minute MAP recording rate 19.6%), with 96.2% of non-null segments consisting of isolated single minutes, recorded MAP is not a random sample of the surgical period. Cases monitored only during stable intervals could be under-counted as burden-free, so the reported prevalence and performance may be sensitive to which minutes were recorded. We state this as a structural limitation of deriving burden from intermittent non-invasive measurement rather than continuous arterial pressure.
+10. **External discrimination may be inflated by recording density.** VitalDB records continuous arterial pressure, which both defines the outcome and supplies the MAP predictors far more densely and cleanly than the intermittent non-invasive measurement in MOVER/SIS; blood-pressure autocorrelation under dense sampling can inflate apparent ranking discrimination relative to the development cohort. The external AUROC of 0.744 should therefore be read as evidence that ranking transferred under a denser measurement regime, not as evidence of intrinsically better discrimination than the development cohort.
+11. **The model largely reflects the present blood pressure.** The dominant predictor is the
+    pre-anchor MAP level, and the next strongest predictors are the maximum pre-anchor MAP and the
+    fraction of pre-anchor readings already below 65 mmHg. The model therefore largely extrapolates
+    the patient's current pressure rather than discovering independent risk, and adds limited
+    information beyond what a clinician reading the bedside monitor already has; a decision-curve
+    benchmark against a MAP-only logistic model showed the full model's incremental net benefit was
+    only 0.013 at threshold 0.15 (Figure 4).
+12. **Anchor placement is imprecise for a minority of cases.** The Intubation anchor occurred a
+    median of 15 minutes after OR start, but the distribution has a long right tail: 325 cases had
+    an anchor more than 60 minutes after OR start (maximum 751 minutes, about 12.5 hours), so for
+    those cases the "pre-anchor" window describes mid- or post-operative physiology rather than
+    induction. In addition, a small number of clinically implausible events were recorded before
+    the anchor (four extubations, one cardiopulmonary resuscitation and three head-frame
+    applications, at lags up to 2,853 minutes), which we retained rather than silently deleted;
+    they affect the pre-anchor event counters only.
+13. **The transported feature set includes features with no external support.** Four of the 53
+    transported features are recording-cadence counters whose VitalDB values lie far outside the
+    MOVER range (median MAP-reading count 450 versus 3; minutes since last MAP reading 0.02 versus
+    1.0), and one contextual feature (anchor is intubation) is frozen at zero in VitalDB. A
+    sensitivity analysis restricting the transported model to the 39 physiological value-domain
+    features is reported in the Results; the external discrimination under that restriction was
+    AUROC 0.713 (95% CI 0.670–0.750) and AUPRC 0.151 (0.119–0.196) – only marginally below the 53-feature shipped value (0.744/0.158), confirming the dropped recording-cadence and context features contributed little.
+14. **The external outcome is not the development outcome.** Because VitalDB samples arterial
+    pressure far more densely, the same proportion-based rule implies a much larger absolute
+    exposure for a positive external label (about 44 cumulative minutes below 65 mmHg at the median
+    recording density versus 9 readings in MOVER), so the external prevalence of 5.73% is not
+    directly comparable with the internal 15.55%. A sensitivity analysis re-deriving the external
+    labels on a common one-minute grid with absolute-time thresholds is reported in the Results
+    and showed the transported model still discriminated comparably (D1_samples: AUROC 0.744, AUPRC 0.158), confirming the transportability signal is not an artefact of the development label definition.
 
 ### What this study adds
 
-Beyond the modest absolute performance, this study contributes four elements that are under-reported
+Beyond the modest absolute performance, this study contributes five elements that are under-reported
 in perioperative hypotension prediction and that hold independently of the discrimination achieved.
 
 1. **A quantitative leakage audit on a public operating-room resource.** All seven time-stamped
-   predictor domains were truncated at the prediction origin with zero residual horizon overlap
-   (maximum interval 0.00 minutes; no unparseable timestamps). Such audits are uncommon yet
-   essential wherever near-perfect discrimination has been claimed on sparse data, and they
-   convert an unverifiable "cannot be reproduced" concern into a reported, auditable fact.
+   predictor domains were truncated at the prediction origin with no used record postdating its
+   anchor (maximum interval 0.00 minutes; no unparseable timestamps), and the one residual boundary
+   overlap — a MAP reading recorded exactly at the anchor minute, which belongs to both the feature
+   and the outcome window — is quantified and shown not to change the conclusions. Such audits are
+   uncommon yet essential wherever near-perfect discrimination has been claimed on sparse data,
+   and they convert an unverifiable "cannot be reproduced" concern into a reported, auditable fact.
 2. **A 14-definition outcome sensitivity analysis.** Apparent performance is shown to be largely an
    artefact of the chosen hypotension definition (prevalence spanning 0.01%–65.8%), and
    sustained-duration definitions are demonstrated to be effectively unmeasurable under the observed
@@ -636,11 +721,14 @@ in perioperative hypotension prediction and that hold independently of the discr
    reframes the result as a calibrated risk-stratification aid anchored on the pre-induction pressure
    rather than a discovery of new physiology, and supplies future work with a realistic baseline on
    this resource.
-5. **An honest external validation on an independent resource.** In VitalDB the model was applied
-   unchanged; discrimination transferred (AUROC 0.751, in the same range as and overlapping the
-   confidence interval of the internal 0.698–0.710 for the same feature set) while calibration did not, isolating exactly what does and does not generalise
-   and supplying a concrete deployment requirement (local recalibration on the deployment cohort's own anchor and recording regime) rather than an abstract
-   "needs external validation" caveat.
+5. **An honest external transportability check on an independent resource.** In VitalDB the model
+   was applied unchanged with its anchor adapted to operation start; discrimination transferred
+   (AUROC 0.744, in the same range as and overlapping the confidence interval of the internal
+   0.698–0.710 for the same feature set) while calibration did not, isolating exactly what does and
+   does not generalise and supplying a concrete deployment requirement (local recalibration on the
+   deployment cohort's own anchor and recording regime) rather than an abstract "needs external
+   validation" caveat. The differing endpoint definitions, recording densities and feature-space
+   support between the two cohorts are quantified rather than glossed over.
 
 ## Conclusions
 
@@ -648,26 +736,27 @@ Using only data available at the anaesthesia induction anchor, a gradient-booste
 modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for cumulative intraoperative
 hypotension burden, reproduced under temporal validation and well calibrated after isotonic
 recalibration. In an independent external cohort (VitalDB, n = 3,735) the same model retained
-discrimination (AUROC 0.751) without refitting — a transportability check rather than a like-for-like
-validation, because the external anchor (operation start) postdates induction — although absolute
-probabilities were not calibrated to that cohort and would require local updating. Most of the predictive information resided in the
-pre-anchor arterial pressure level, suggesting that such models primarily identify patients who are
-already relatively hypotensive at induction rather than anticipating new events. We recommend that
-future work on this and similar resources prioritise local recalibration on the deployment cohort's own anchor and recording regime, explicit
-reporting of the outcome definition and its prevalence, and routine quantification of recording
-density, and that claims of near-perfect discrimination on sparse non-invasive data be treated with
-corresponding caution.
+discrimination (AUROC 0.744) without refitting — a transportability check rather than a like-for-like
+validation, because the external anchor (operation start) postdates induction and the external
+outcome is defined on denser arterial sampling — although absolute probabilities were not
+calibrated to that cohort and would require local updating. Most of the predictive information
+resided in the pre-anchor arterial pressure level, suggesting that such models primarily identify
+patients who are already relatively hypotensive at induction rather than anticipating new events. We
+recommend that future work on this and similar resources prioritise local recalibration on the
+deployment cohort's own anchor and recording regime, explicit reporting of the outcome definition
+and its prevalence, and routine quantification of recording density, and that claims of
+near-perfect discrimination on sparse non-invasive data be treated with corresponding caution.
 
 ---
 
 ## List of abbreviations
 
-AKI, acute kidney injury; AUROC, area under the receiver operating characteristic curve; AUPRC,
-area under the precision–recall curve; BMI, body mass index; DUA, data use agreement; IOH,
-intraoperative hypotension; IQR, interquartile range; MAP, mean arterial pressure; MOVER, Medical
-Informatics Operating Room Vitals and Events Repository; OR, operating room; SIS, surgical
-information system; SpO₂, peripheral oxygen saturation; TRIPOD, Transparent Reporting of a
-multivariable prediction model for Individual Prognosis Or Diagnosis; VitalDB, Vital Signs Database.
+ASA, American Society of Anesthesiologists; AUROC, area under the receiver operating
+characteristic curve; AUPRC, area under the precision–recall curve; BMI, body mass index; IQR,
+interquartile range; MAP, mean arterial pressure; MOVER, Medical Informatics Operating Room Vitals
+and Events Repository; OR, operating room; SIS, surgical information system; SpO₂, peripheral
+oxygen saturation; TRIPOD, Transparent Reporting of a multivariable prediction model for
+Individual Prognosis Or Diagnosis; VitalDB, Vital Signs Database.
 
 ## Declarations
 
@@ -766,9 +855,9 @@ an author.
 ## Figure legends
 
 **Figure 1. Cohort construction.** Flow from 19,114 screened records to the 16,861 analysed cases,
-showing exclusions for implausible operating room window (n = 8), operating room window shorter
-than 60 minutes (n = 1,632), age below 18 years (n = 371) and absent or out-of-window prediction
-anchor (n = 242).
+showing exclusions for implausible operating room window (n = 8), fewer than 60 recorded
+vital-sign observations within the operating-room window (n = 1,632), age below 18 years (n = 371)
+and absent or out-of-window prediction anchor (n = 242).
 
 **Figure 2. Prevalence of the 14 candidate outcome definitions.** Definitions ordered by prevalence,
 with the primary definition D1 highlighted.
@@ -782,7 +871,9 @@ logistic benchmark, treat all and treat none.
 
 **Figure 5. Predictor importance.** Twenty-five highest-gain predictors from XGBoost.
 
-**Figure 6. External validation in VitalDB.** Receiver operating characteristic (left), precision–recall (centre) and predicted-risk distribution (right) for the MOVER core model applied unchanged to the VitalDB arterial cohort (n = 3,735; outcome prevalence 5.73%).
+**Figure 6. External transportability check in VitalDB.** Receiver operating characteristic
+(left), precision–recall (centre) and predicted-risk distribution (right) for the MOVER core model
+applied unchanged to the VitalDB arterial cohort (n = 3,735; outcome prevalence 5.73%).
 
 ## Additional files
 

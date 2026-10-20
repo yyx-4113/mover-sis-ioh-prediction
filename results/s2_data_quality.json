@@ -18,6 +18,21 @@
    "  Unknown": 2,
    " Unknown": 2
   },
+  "male_n": 8355,
+  "female_n": 8502,
+  "sex_unknown_n": 4,
+  "age_mean": 52.89,
+  "age_sd": 17.72,
+  "age_median": 54.0,
+  "age_q1": 39.0,
+  "age_q3": 66.0,
+  "age_min": 18.0,
+  "age_max": 117.0,
+  "bmi_mean": 27.76,
+  "bmi_sd": 6.96,
+  "bmi_median": 26.573129251700685,
+  "bmi_q1": 23.08254200146092,
+  "bmi_q3": 30.864197530864192,
   "bmi_computable": 16699,
   "bmi_computable_pct": 0.9904,
   "ht_missing": 141,
@@ -78,6 +93,9 @@
    "max_used_time_minus_anchor": 0.0,
    "n_time_nat": 0,
    "window_minutes": 15,
+   "window_closed_at_anchor": true,
+   "n_rows_at_anchor_minute": 16695,
+   "n_pids_at_anchor_minute": 16695,
    "n_rows_in_window": 215658,
    "n_pids_in_window": 16740
   },
@@ -89,6 +107,9 @@
    "max_used_time_minus_anchor": 0.0,
    "n_time_nat": 0,
    "window_minutes": 15,
+   "window_closed_at_anchor": true,
+   "n_rows_at_anchor_minute": 4099,
+   "n_pids_at_anchor_minute": 4047,
    "n_rows_in_window": 48309,
    "n_pids_in_window": 4832
   },
@@ -100,6 +121,9 @@
    "max_used_time_minus_anchor": 0.0,
    "n_time_nat": 0,
    "window_minutes": 15,
+   "window_closed_at_anchor": true,
+   "n_rows_at_anchor_minute": 4837,
+   "n_pids_at_anchor_minute": 4837,
    "n_rows_in_window": 62953,
    "n_pids_in_window": 4852
   },
@@ -212,6 +236,20 @@
    "HCO3": 0.5565,
    "HgB": 0.513
   }
+ },
+ "io_classification": {
+  "n_records_by_class": {
+   "crystalloid": 1531,
+   "blood": 1316,
+   "urine": 389,
+   "ebl": 42,
+   "tpn_in": 39,
+   "colloid": 36,
+   "other_out": 3,
+   "medication_iv": 1
+  },
+  "sign_violation_pids": {},
+  "note": "tpn_in/medication_iv 为营养与药物类输入，不计入六类液体容量特征；符号违例 PID 数按类披露（净量与输入/输出语义相反者）。"
  },
  "fluids": {
   "n_pids_with_io_pre_anchor": 2794,

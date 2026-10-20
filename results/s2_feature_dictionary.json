@@ -1239,5 +1239,6 @@
    "source": "patient_input_output",
    "window": "<= anchor"
   }
- ]
+ ],
+ "window_closed_at_anchor": true
 }

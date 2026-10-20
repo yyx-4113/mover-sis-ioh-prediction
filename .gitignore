@@ -23,3 +23,6 @@ data_vitaldb/
 results/ext/vitaldb_features.csv
 results/ext/vitaldb_labels.csv
 results/ext/vitaldb_predictions.csv
+
+# Stray reserved-name artifact (Windows device name); not part of the package
+/nul

@@ -183,5 +183,5 @@
   "Intubation": 13834,
   "Surgery_start": 3027
  },
- "note": "标签窗口 = [anchor_time, OR_end]。anchor 默认取首个 Intubation 事件（中位 OR_start+13min），无 Intubation 者以 Surgery_start 兜底。若用全窗口标签，预测窗内的低血压已被特征揭示，属目标泄漏。"
+ "note": "标签窗口 = [anchor_time, OR_end]。anchor 默认取首个 Intubation 事件（Intubation 锚点中位 OR_start+14min），无 Intubation 者以 Surgery_start 兜底。若用全窗口标签，预测窗内的低血压已被特征揭示，属目标泄漏。"
 }

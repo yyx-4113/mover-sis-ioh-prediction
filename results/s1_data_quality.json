@@ -44,12 +44,22 @@
  },
  "anchor_minus_or_start_min": {
   "p05": 7.0,
+  "p25": 11.0,
   "p50": 15.0,
-  "p95": 46.0
+  "p75": 24.0,
+  "p95": 46.0,
+  "intubation_only_p05": 6.0,
+  "intubation_only_p50": 14.0,
+  "intubation_only_p95": 32.0
  },
  "post_window_minutes": {
   "p05": 49.0,
   "p50": 147.0,
   "p95": 440.0
+ },
+ "pre_or_window_map_coverage": {
+  "window": "[OR_start-30min, OR_start)",
+  "n_cases_with_any_map": 43,
+  "pct_cases_with_any_map": 0.26
  }
 }

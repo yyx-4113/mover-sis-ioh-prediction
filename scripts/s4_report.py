@@ -260,6 +260,8 @@ def add(metric, value, src, how):
 S1 = "python scripts/s1_cohort.py"
 S2 = "python scripts/s2_features.py"
 S3 = "python scripts/s3_models.py"
+S6 = "python scripts/s6_sensitivity.py"
+EXT = "python scripts/ext_pipeline.py + scripts/ext_core_benchmark.py"
 add("cohort.source_pids", cohort["source_pids"], "results/s1_cohort.json", S1)
 add("cohort.excl_implausible_or_window", cohort["excl_implausible_or_window"], "results/s1_cohort.json", S1)
 add("cohort.excl_short_or_window", cohort["excl_short_or_window"], "results/s1_cohort.json", S1)
@@ -329,13 +331,15 @@ for k, v in subg["temporal"].items():
     add(f"subgroup.temporal.{k}.auprc", v, "results/s3_subgroups.json", S3)
 
 # 记录密度（正文 284–288 行）
+# Round-6 订正（A3-minor）：column_non_null_rate 是 patient_vitals 全表行非空率，
+# 不是 case-minute 率；键名据此更正，真正的 case-minute 率由 s6 S8 计算并入。
 dq1 = json.load(open(os.path.join(RES, "s1_data_quality.json"), encoding="utf-8"))
 _col = dq1["column_non_null_rate"]; _seg = dq1["nmap_segment_length_distribution"]; _pp = dq1["nmap_measurements_per_pid"]
-add("density.nmap_case_minute_pct", round(_col["nMAP"] * 100, 2), "results/s1_data_quality.json", S1)
-add("density.sbp_case_minute_pct", round(_col["nSBP"] * 100, 2), "results/s1_data_quality.json", S1)
-add("density.dbp_case_minute_pct", round(_col["nDBP"] * 100, 2), "results/s1_data_quality.json", S1)
-add("density.hr_case_minute_pct", round(_col["HRe"] * 100, 2), "results/s1_data_quality.json", S1)
-add("density.spo2_case_minute_pct", round(_col["SP02"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.nmap_row_non_null_pct", round(_col["nMAP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.sbp_row_non_null_pct", round(_col["nSBP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.dbp_row_non_null_pct", round(_col["nDBP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.hr_row_non_null_pct", round(_col["HRe"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.spo2_row_non_null_pct", round(_col["SP02"] * 100, 2), "results/s1_data_quality.json", S1)
 add("density.nmap_segments_total", _seg["total_segments"], "results/s1_data_quality.json", S1)
 add("density.nmap_segment_length1_share_pct", round(_seg["length_1_share"] * 100, 2), "results/s1_data_quality.json", S1)
 add("density.nmap_per_case_median", float(_pp["p50"]), "results/s1_data_quality.json", S1)
@@ -366,15 +370,65 @@ for _dom, _val in _cov_cases.items():
 
 # 表 1 关键队列统计量
 add("cohort.age_median", float(_feat["age"].median()), "results/s2_features.csv", S2)
+add("cohort.age_q1", float(_feat["age"].quantile(0.25)), "results/s2_features.csv", S2)
+add("cohort.age_q3", float(_feat["age"].quantile(0.75)), "results/s2_features.csv", S2)
 add("cohort.male_n", int((_feat["male"] == 1).sum()), "results/s2_features.csv", S2)
 add("cohort.female_n", int((_feat["male"] == 0).sum()), "results/s2_features.csv", S2)
+add("cohort.sex_unknown_n", int(_feat["male"].isna().sum()), "results/s2_features.csv", S2)
 add("cohort.bmi_median", round(float(_feat["bmi"].median()), 1), "results/s2_features.csv", S2)
+add("cohort.bmi_q1", round(float(_feat["bmi"].quantile(0.25)), 1), "results/s2_features.csv", S2)
+add("cohort.bmi_q3", round(float(_feat["bmi"].quantile(0.75)), 1), "results/s2_features.csv", S2)
 add("cohort.preanchor_map_mean_median", round(float(_feat["map_mean"].median()), 1), "results/s2_features.csv", S2)
 add("cohort.post_anchor_window_median_min", dq1["post_window_minutes"]["p50"],
     "results/s1_data_quality.json", S1)
+add("cohort.or_window_observations_16861", cohort["or_window_observations"],
+    "results/s1_cohort.json", S1)
+add("cohort.anchor_source_pct.Intubation",
+    round(100 * cohort["anchor_source_counts"]["Intubation"] / N, 2),
+    "results/s1_cohort.json", S1)
+add("cohort.anchor_source_pct.Surgery_start",
+    round(100 * cohort["anchor_source_counts"]["Surgery_start"] / N, 2),
+    "results/s1_cohort.json", S1)
+# 锚点分钟重叠（Round-6 A2-M2：特征窗与标签窗在锚点时刻相接）
+_ov = json.load(open(os.path.join(RES, "s6_sensitivity.json"), encoding="utf-8")).get(
+    "S7_anchor_minute_overlap", {})
+if _ov:
+    add("leakage.anchor_minute.cases_with_map_at_anchor",
+        _ov["n_cases_with_map_exactly_at_anchor"], "results/s6_sensitivity.json", S6)
+    add("leakage.anchor_minute.cases_anchor_map_below_65",
+        _ov["n_cases_anchor_map_below_65"], "results/s6_sensitivity.json", S6)
+    add("leakage.anchor_minute.label_strict_flip_pos_to_neg",
+        _ov["label_window_strict_variant"]["flip_positive_to_negative"],
+        "results/s6_sensitivity.json", S6)
+    add("leakage.anchor_minute.label_strict_flip_neg_to_pos",
+        _ov["label_window_strict_variant"]["flip_negative_to_positive"],
+        "results/s6_sensitivity.json", S6)
+
+# 表 5 亚组：n（测试集）+ 层患病率（全队列）+ AUPRC/患病率 比值
+_yy = pd.read_csv(os.path.join(RES, "s1_labels_postanchor.csv")).set_index("PID")["D1"].astype(int)
+_yf = _feat.set_index("PID")
+_strata = {
+    "sex_male": (_yf["male"] == 1), "sex_female": (_yf["male"] == 0),
+    "age<50": (_yf["age"] < 50), "age50-65": ((_yf["age"] >= 50) & (_yf["age"] < 65)),
+    "age>=65": (_yf["age"] >= 65),
+    "bmi<18.5": (_yf["bmi"] < 18.5), "bmi18.5-25": ((_yf["bmi"] >= 18.5) & (_yf["bmi"] < 25)),
+    "bmi25-30": ((_yf["bmi"] >= 25) & (_yf["bmi"] < 30)), "bmi>=30": (_yf["bmi"] >= 30),
+}
+for _k, _mask in _strata.items():
+    _m = _mask.fillna(False)
+    add(f"subgroup.cohort_n.{_k}", int(_m.sum()), "results/s2_features.csv", S2)
+    add(f"subgroup.cohort_prevalence.{_k}", round(float(_yy.loc[_yf.index][_m].mean()), 4),
+        "results/s1_labels_postanchor.csv + results/s2_features.csv", S1)
+for _k, _v in subg["patient"].items():
+    _pv = float(_yy.loc[_yf.index][_strata[_k].fillna(False)].mean())
+    add(f"subgroup.patient.{_k}.auprc_over_prevalence", round(_v / _pv, 2),
+        "results/s3_subgroups.json + results/s2_features.csv", S3)
+for _k, _v in subg["temporal"].items():
+    _pv = float(_yy.loc[_yf.index][_strata[_k].fillna(False)].mean())
+    add(f"subgroup.temporal.{_k}.auprc_over_prevalence", round(_v / _pv, 2),
+        "results/s3_subgroups.json + results/s2_features.csv", S3)
 
 # 表 5 亚组 n（测试集，与 AUPRC 同口径）
-_yy = pd.read_csv(os.path.join(RES, "s1_labels_postanchor.csv")).set_index("PID")["D1"].astype(int)
 _ridx, _teidx = train_test_split(_feat.set_index("PID").index, test_size=0.2,
                                 random_state=int(cfg["modeling"]["seed"]), stratify=_yy)
 _fte = _feat.set_index("PID").loc[_teidx]
@@ -395,6 +449,94 @@ def _subgroup_n(X):
 
 for _k, _v in _subgroup_n(_fte).items():
     add(f"subgroup.patient.test_n.{_k}", _v, "results/s2_features.csv (reproduced patient split)", S3)
+
+# ---------------- Round-6 扩展：外部验证块（A4-F2 / A3-M2 审计链缺口） ----------------
+try:
+    ext = J("ext/external_validation.json")
+    add("external.n_cases", ext["n_cases"], "results/ext/external_validation.json", EXT)
+    add("external.n_d1_positive", ext["n_d1_positive"], "results/ext/external_validation.json", EXT)
+    add("external.prevalence_D1", ext["prevalence_D1"], "results/ext/external_validation.json", EXT)
+    add("external.auprc", ext["auprc"], "results/ext/external_validation.json", EXT)
+    add("external.auprc_ci95", ext["auprc_ci95"], "results/ext/external_validation.json", EXT)
+    add("external.auroc", ext["auroc"], "results/ext/external_validation.json", EXT)
+    add("external.auroc_ci95", ext["auroc_ci95"], "results/ext/external_validation.json", EXT)
+    add("external.brier", ext["brier"], "results/ext/external_validation.json", EXT)
+    add("external.pred_mean", ext.get("pred_mean"), "results/ext/external_validation.json", EXT)
+except Exception as e:
+    log(STAGE, f"[warn] 外部验证审计行跳过: {e}")
+
+try:
+    cb = J("ext/core_benchmark.json")
+    for _split in ("patient", "temporal"):
+        if _split in cb:
+            add(f"external.internal_core53.{_split}.auprc", cb[_split]["auprc"],
+                "results/ext/core_benchmark.json", EXT)
+            add(f"external.internal_core53.{_split}.auroc", cb[_split]["auroc"],
+                "results/ext/core_benchmark.json", EXT)
+except Exception as e:
+    log(STAGE, f"[warn] 内部 53 特征基准审计行跳过: {e}")
+
+# ---------------- Round-6 扩展：s6 敏感性分析块 ----------------
+try:
+    s6 = J("s6_sensitivity.json")
+    _s1b = s6.get("S1_restricted_cohort")
+    if _s1b:
+        add("sens.S1_restricted.n", _s1b["n"], "results/s6_sensitivity.json", S6)
+        add("sens.S1_restricted.prevalence", _s1b["prevalence"], "results/s6_sensitivity.json", S6)
+        add("sens.S1_restricted.excluded_nbc_n", _s1b["excluded_nbc_n"],
+            "results/s6_sensitivity.json", S6)
+        for _r in _s1b.get("results", []):
+            if _r["model"] == "xgboost":
+                add(f"sens.S1_restricted.{_r['split']}.xgboost.auprc", _r["auprc"],
+                    "results/s6_sensitivity.json", S6)
+                add(f"sens.S1_restricted.{_r['split']}.xgboost.auroc", _r["auroc"],
+                    "results/s6_sensitivity.json", S6)
+    if s6.get("S2_half_open_window", {}).get("results"):
+        for _r in s6["S2_half_open_window"]["results"]:
+            if _r["model"] == "xgboost":
+                add(f"sens.S2_halfopen.{_r['split']}.xgboost.auprc", _r["auprc"],
+                    "results/s6_sensitivity.json", S6)
+                add(f"sens.S2_halfopen.{_r['split']}.xgboost.auroc", _r["auroc"],
+                    "results/s6_sensitivity.json", S6)
+    if s6.get("S8_recording_density_case_minute"):
+        add("density.nmap_case_minute_pct",
+            round(100 * s6["S8_recording_density_case_minute"]["case_minute_recording_rate"], 2),
+            "results/s6_sensitivity.json", S6)
+    for _k, _v in (s6.get("S3_external_time_labels", {}).get("variants", {})).items():
+        if _v.get("auroc") is not None:
+            add(f"sens.S3_external_label.{_k}.prevalence", _v.get("prevalence"),
+                "results/s6_sensitivity.json", S6)
+            add(f"sens.S3_external_label.{_k}.auroc", _v.get("auroc"),
+                "results/s6_sensitivity.json", S6)
+            add(f"sens.S3_external_label.{_k}.auprc", _v.get("auprc"),
+                "results/s6_sensitivity.json", S6)
+    _s4c = s6.get("S4_external_calibration", {})
+    if _s4c:
+        add("external.calib_slope_logit", _s4c.get("calib_slope_logit"),
+            "results/s6_sensitivity.json", S6)
+        add("external.calib_intercept_logit", _s4c.get("calib_intercept_logit"),
+            "results/s6_sensitivity.json", S6)
+        add("external.calibration_in_the_large", _s4c.get("calibration_in_the_large"),
+            "results/s6_sensitivity.json", S6)
+    _s5 = s6.get("S5_external_funnel", {})
+    if _s5:
+        add("external.funnel.n_vitaldb_cases", _s5.get("n_vitaldb_cases_with_vitals"),
+            "results/s6_sensitivity.json", S6)
+        add("external.funnel.n_with_art_map_track", _s5.get("n_with_art_map_track"),
+            "results/s6_sensitivity.json", S6)
+        add("external.funnel.n_zero_post_map", _s5.get("n_zero_post_map"),
+            "results/s6_sensitivity.json", S6)
+    _s6p = s6.get("S6_physiological_subset", {})
+    if _s6p:
+        add("sens.S6_physio.n_features", _s6p.get("n_physio_features"),
+            "results/s6_sensitivity.json", S6)
+        if _s6p.get("external_unrefitted_raw", {}).get("auroc") is not None:
+            add("sens.S6_physio.external.auroc", _s6p["external_unrefitted_raw"]["auroc"],
+                "results/s6_sensitivity.json", S6)
+            add("sens.S6_physio.external.auprc", _s6p["external_unrefitted_raw"]["auprc"],
+                "results/s6_sensitivity.json", S6)
+except Exception as e:
+    log(STAGE, f"[warn] s6 审计行跳过: {e}")
 
 pd.DataFrame(trail).to_csv(os.path.join(RES, "s4_audit_trail.csv"), index=False, encoding="utf-8-sig")
 log(STAGE, f"audit trail -> results/s4_audit_trail.csv ({len(trail)} 行)")

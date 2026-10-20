@@ -75,10 +75,11 @@ assert not (BANNED & set(X.columns)), f"泄漏列进入特征矩阵: {sorted(BAN
 assert X.select_dtypes(include="object").shape[1] == 0, "仍有对象列"
 log(STAGE, f"特征矩阵 {X.shape[0]}×{X.shape[1]}；丢弃非数值列 {obj_cols}")
 
-# 缺失处理：树模型保留 NaN（原生）；Logistic 中位数插补+缺失指示
-imp = SimpleImputer(strategy="median", add_indicator=True)
-X_log = pd.DataFrame(imp.fit_transform(X), index=X.index,
-                     columns=imp.get_feature_names_out(X.columns))
+# 缺失处理：树模型保留 NaN（原生）；Logistic 中位数插补+缺失指示。
+# Round-6 A2-M3/A3-minor 修复：插补器原先在全队列 fit_transform 后才切分，
+# 测试集参与了插补中位数的估计。现改为把插补器作为 pipeline 首步，
+# 仅在各自训练折上拟合，再 transform 训练/测试——杜绝测试信息进入预处理。
+# （原全局 X_log 已删除；log 模型现在直接吃含 NaN 的 X，由 pipeline 内插补。）
 base_cols = [c for c in ["age", "male", "bmi"] if c in X.columns]
 assert len(base_cols) == 3, f"基线特征缺失: {base_cols}"
 
@@ -126,9 +127,11 @@ def build_models(ytr):
     spw = max(1.0, (ytr == 0).sum() / max(1, (ytr == 1).sum()))
     return {
         "baseline_logit": dict(src="log", cols=base_cols, factory=lambda: Pipeline([
+            ("imputer", SimpleImputer(strategy="median", add_indicator=True)),
             ("scaler", StandardScaler()),
             ("clf", LogisticRegression(max_iter=3000, class_weight="balanced"))])),
         "logistic_full": dict(src="log", cols=None, factory=lambda: Pipeline([
+            ("imputer", SimpleImputer(strategy="median", add_indicator=True)),
             ("scaler", StandardScaler()),
             ("clf", LogisticRegression(max_iter=3000, class_weight="balanced"))])),
         "xgboost": dict(src="tree", cols=None, factory=lambda: xgb.XGBClassifier(
@@ -189,9 +192,10 @@ for (split, tr_i, te_i) in [("patient", ridx, teidx), ("temporal", ridx_t, teidx
     fitted = {}
     for name, spec in models.items():
         if spec["src"] == "log":
+            # 插补在 pipeline 内、仅在训练折拟合（Round-6 修复）；此处直接传含 NaN 的 X
             cols = spec["cols"]
-            Xtr_m = X_log.loc[tr_i, cols] if cols is not None else X_log.loc[tr_i]
-            Xte_m = X_log.loc[te_i, cols] if cols is not None else X_log.loc[te_i]
+            Xtr_m = X.loc[tr_i, cols] if cols is not None else X.loc[tr_i]
+            Xte_m = X.loc[te_i, cols] if cols is not None else X.loc[te_i]
         else:
             Xtr_m, Xte_m = X.loc[tr_i], X.loc[te_i]
         rec, model, p = fit_eval(spec["factory"], Xtr_m, ytr, Xte_m, yte, name, split)
@@ -211,8 +215,19 @@ for (split, tr_i, te_i) in [("patient", ridx, teidx), ("temporal", ridx_t, teidx
     p_cal = iso.predict(p_raw)
     brier_raw = brier_score_loss(yte, p_raw)
     brier_cal = brier_score_loss(yte, p_cal)
-    # 校准 in-the-small：y ~ a + b*p（线性）
+    # 校准 in-the-small（Round-6 A2-M8/A3-minor 修复：原文称"log-odds scale"，
+    # 实现实为概率尺度线性概率模型 y = a + b*p。现两者都算、分别标注）：
+    #   ① 概率尺度 LPM：y = a + b*p
+    #   ② logit 尺度 logistic 重校准：logit(y) = a + b*logit(p)（Steyerberg 标准口径）
     sl, ic = np.polyfit(p_cal, yte.values, 1)
+    _p = np.clip(p_cal, 1e-6, 1 - 1e-6)
+    _lp = np.log(_p / (1 - _p)).reshape(-1, 1)
+    try:
+        _lr = LogisticRegression(C=1e10, max_iter=2000)
+        _lr.fit(_lp, yte.values)
+        sl_logit, ic_logit = float(_lr.coef_[0][0]), float(_lr.intercept_[0])
+    except Exception:
+        sl_logit, ic_logit = float("nan"), float("nan")
     frac_pos, mean_pred = calibration_curve(yte, p_cal, n_bins=10, strategy="quantile")
     frac_pos_raw, mean_pred_raw = calibration_curve(yte, p_raw, n_bins=10, strategy="quantile")
     # DCA
@@ -228,6 +243,10 @@ for (split, tr_i, te_i) in [("patient", ridx, teidx), ("temporal", ridx_t, teidx
         "model": "xgboost", "calibration": "isotonic_oof",
         "brier_raw": round(brier_raw, 4), "brier_calibrated": round(brier_cal, 4),
         "calib_slope": round(float(sl), 4), "calib_intercept": round(float(ic), 4),
+        "calib_slope_scale": "probability (LPM: y = a + b*p)",
+        "calib_slope_logit": round(float(sl_logit), 4),
+        "calib_intercept_logit": round(float(ic_logit), 4),
+        "calibration_in_the_large": round(float(np.mean(p_cal) - np.mean(yte.values)), 4),
         "calibration_curve": {"mean_pred": mean_pred.tolist(), "frac_pos": frac_pos.tolist()},
         "calibration_curve_raw": {"mean_pred": mean_pred_raw.tolist(), "frac_pos": frac_pos_raw.tolist()},
         "dca": {"thresholds": grids.tolist(), "net_benefit_model": nb_model,
@@ -235,6 +254,12 @@ for (split, tr_i, te_i) in [("patient", ridx, teidx), ("temporal", ridx_t, teidx
     }
     # 亚组
     subgroups[split] = subgroup_auprc(yte.values, p_cal, Xte, split)
+
+    # Round-6：持久化主模型（xgboost）测试集预测，供 s6 敏感性分析与审计追踪复用，
+    # 避免重训引入 n_jobs=-1 的多线程非确定性（A3 曾发现两产物间 0.3392/0.3396 漂移）
+    pd.DataFrame({"PID": Xte.index, "y": yte.values,
+                  "p_xgb_raw": p_raw, "p_xgb_cal": p_cal}).to_csv(
+        os.path.join(RES, f"s3_test_predictions_{split}.csv"), index=False)
 
     # 重要性（主切分患者级才存图/表；temporal 仅指标）
     if split == "patient":
