@@ -131,12 +131,17 @@ def fig4():
                   f"int={cd['calib_intercept']:.3f})", fontsize=10.5)
     ax1.legend(fontsize=8, loc="upper left")
     g = cd["dca"]["thresholds"]
-    ax2.plot(g, cd["dca"]["net_benefit_model"], color="#1f77b4", lw=1.8, label="model")
+    ax2.plot(g, cd["dca"]["net_benefit_model"], color="#1f77b4", lw=1.8, label="model (full)")
     ax2.plot(g, cd["dca"]["net_benefit_treat_all"], color="#c0392b", lw=1.3, label="treat all")
     ax2.plot(g, cd["dca"]["net_benefit_treat_none"], color="#7f7f7f", lw=1.3, label="treat none")
+    bm = json.load(open(os.path.join(RES, "s3_calib_dca.json"))).get("map_only_benchmark")
+    if bm:
+        g2 = bm["dca"]["thresholds"]
+        ax2.plot(g2, bm["dca"]["net_benefit_model"], color="#888888", lw=1.4, ls=":",
+                 label="MAP-only logistic")
     ax2.set_xlabel("Threshold probability"); ax2.set_ylabel("Net benefit")
     ax2.set_title("Decision curve analysis", fontsize=10.5)
-    ax2.legend(fontsize=8, loc="upper right")
+    ax2.legend(fontsize=7.5, loc="upper right")
     fig.suptitle("Figure 4. Calibration and decision curve analysis (XGBoost, patient-level)",
                  fontsize=12, weight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.96])

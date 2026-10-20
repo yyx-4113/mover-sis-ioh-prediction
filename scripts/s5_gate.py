@@ -68,7 +68,7 @@ for ln in lines:
         ref_block += "\n" + ln
 ref_nums = re.findall(r"(?m)^\s*(\d+)\.\s", ref_block)
 ref_count = len(set(ref_nums))
-add("References count == 16", ref_count == 16, "%d references found" % ref_count)
+add("References count == 18", ref_count == 18, "%d references found" % ref_count)
 
 # ---- docx structure ---------------------------------------------------------
 doc = Document(DOCX)
@@ -81,7 +81,7 @@ add("docx has 6 tables", n_tables == 6, "%d tables" % n_tables)
 key_numbers = ["0.347", "0.722", "0.234", "0.301", "0.337", "0.339", "0.733",
                "0.1555", "2,622", "16,861", "13,834", "3,027",
                "175.5", "75.2", "72.2", "69.1", "64.1", "52.9",
-               "0.909", "0.008", "0.119", "0.191", "2.23", "82.0", "18.0"]
+               "0.909", "0.008", "0.119", "0.191", "2.23", "82.1", "17.9"]
 missing = [k for k in key_numbers if k not in md]
 add("Key headline numbers present", len(missing) == 0,
     "all %d present" % len(key_numbers) if not missing else "MISSING: " + ", ".join(missing))

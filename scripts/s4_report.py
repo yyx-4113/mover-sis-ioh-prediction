@@ -10,6 +10,7 @@
 """
 import os, sys, base64, json
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import load_config, paths, log
@@ -291,6 +292,105 @@ for k, v in subg["patient"].items():
     add(f"subgroup.patient.{k}.auprc", v, "results/s3_subgroups.json", S3)
 for r in imp["xgboost_top25"][:10]:
     add(f"importance.xgboost.{r['feature']}", r["gain"], "results/s3_feature_importance.json", S3)
+
+# ---------------- Round-1 扩展：补齐可追溯性缺口 ----------------
+# 时间切分校准
+ct = calib["temporal"]
+add("calib.temporal.brier_raw", ct["brier_raw"], "results/s3_calib_dca.json", S3)
+add("calib.temporal.brier_calibrated", ct["brier_calibrated"], "results/s3_calib_dca.json", S3)
+add("calib.temporal.slope", ct["calib_slope"], "results/s3_calib_dca.json", S3)
+add("calib.temporal.intercept", ct["calib_intercept"], "results/s3_calib_dca.json", S3)
+
+# DCA 净收益：报告点 + 末正阈值（crossing）
+for sp in ("patient", "temporal"):
+    d = calib[sp]["dca"]
+    th, nb = d["thresholds"], d["net_benefit_model"]
+    for tgt in (0.10, 0.15):
+        i = min(range(len(th)), key=lambda k: abs(th[k] - tgt))
+        add(f"dca.{sp}.net_benefit_model@thr{tgt:.2f}", round(float(nb[i]), 6), "results/s3_calib_dca.json", S3)
+    last_pos = max([k for k in range(len(nb)) if nb[k] > 0], default=None)
+    if last_pos is not None:
+        add(f"dca.{sp}.net_benefit_positive_up_to_thr", round(float(th[last_pos]), 2), "results/s3_calib_dca.json", S3)
+        add(f"dca.{sp}.net_benefit_at_crossing", round(float(nb[last_pos]), 6), "results/s3_calib_dca.json", S3)
+
+# MAP-only 逻辑回归 DCA 基准（检验相对床旁 MAP 的增量价值）
+_bm = calib.get("map_only_benchmark", {})
+if _bm:
+    add("benchmark.map_only.auprc_raw", _bm.get("auprc_patient_test_raw"), "results/s3_calib_dca.json", S3)
+    add("benchmark.map_only.auprc_calibrated", _bm.get("auprc_patient_test"), "results/s3_calib_dca.json", S3)
+    add("benchmark.map_only.nb_increment_at_0.10", _bm.get("nb_increment_at_0.10"), "results/s3_calib_dca.json", S3)
+    add("benchmark.map_only.nb_increment_at_0.15", _bm.get("nb_increment_at_0.15"), "results/s3_calib_dca.json", S3)
+
+# 时间切分亚组
+for k, v in subg["temporal"].items():
+    add(f"subgroup.temporal.{k}.auprc", v, "results/s3_subgroups.json", S3)
+
+# 记录密度（正文 284–288 行）
+dq1 = json.load(open(os.path.join(RES, "s1_data_quality.json"), encoding="utf-8"))
+_col = dq1["column_non_null_rate"]; _seg = dq1["nmap_segment_length_distribution"]; _pp = dq1["nmap_measurements_per_pid"]
+add("density.nmap_case_minute_pct", round(_col["nMAP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.sbp_case_minute_pct", round(_col["nSBP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.dbp_case_minute_pct", round(_col["nDBP"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.hr_case_minute_pct", round(_col["HRe"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.spo2_case_minute_pct", round(_col["SP02"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.nmap_segments_total", _seg["total_segments"], "results/s1_data_quality.json", S1)
+add("density.nmap_segment_length1_share_pct", round(_seg["length_1_share"] * 100, 2), "results/s1_data_quality.json", S1)
+add("density.nmap_per_case_median", float(_pp["p50"]), "results/s1_data_quality.json", S1)
+
+# 1,496 例监测稀疏排除 + 条件患病率
+_n_ge10 = dq1["postanchor_nmap_measurements"]["n_ge_10"]
+add("outcome.D1.n_cases_lt10_postanchor_map", N - _n_ge10, "results/s1_data_quality.json + results/s1_cohort.json", S1)
+add("outcome.D1.conditional_prevalence_ge10meas", round(d1["positive_pids"] / (N - _n_ge10), 4),
+    "results/s1_outcomes_postanchor.json + results/s1_data_quality.json", S1)
+
+# 表 3 病例计数覆盖率（与正文 Coverage(%) 一致），另存为 case_count 行
+_feat = pd.read_csv(os.path.join(RES, "s2_features.csv"))
+_cov_cases = {
+    "anchor": N,
+    "demographics": "n/a (static)",
+    "surgery": N,
+    "anesthesia_technique": dq["anesthesia_technique"]["n_events_pre_anchor_pids"],
+    "medication_pre_anchor": dq["medication"]["n_pids_with_drug_pre_anchor"],
+    "non_invasive_bp": int((_feat["map_n"] > 0).sum()),
+    "ventilation": dq["ventilation"]["n_pids_with_vent_in_window"],
+    "invasive_monitoring": dq["invasive_monitoring"]["n_pids_with_art_in_window"],
+    "fluid_bleeding": dq["fluids"]["n_pids_with_io_pre_anchor"],
+    "laboratories": dq["labs"]["n_pids_with_lab_pre_anchor"],
+}
+for _dom, _val in _cov_cases.items():
+    add(f"coverage.case_count.{_dom}", _val, "results/s2_data_quality.json / results/s2_features.csv", S2)
+
+# 表 1 关键队列统计量
+add("cohort.age_median", float(_feat["age"].median()), "results/s2_features.csv", S2)
+add("cohort.male_n", int((_feat["male"] == 1).sum()), "results/s2_features.csv", S2)
+add("cohort.female_n", int((_feat["male"] == 0).sum()), "results/s2_features.csv", S2)
+add("cohort.bmi_median", round(float(_feat["bmi"].median()), 1), "results/s2_features.csv", S2)
+add("cohort.preanchor_map_mean_median", round(float(_feat["map_mean"].median()), 1), "results/s2_features.csv", S2)
+add("cohort.post_anchor_window_median_min", dq1["post_window_minutes"]["p50"],
+    "results/s1_data_quality.json", S1)
+
+# 表 5 亚组 n（测试集，与 AUPRC 同口径）
+_yy = pd.read_csv(os.path.join(RES, "s1_labels_postanchor.csv")).set_index("PID")["D1"].astype(int)
+_ridx, _teidx = train_test_split(_feat.set_index("PID").index, test_size=0.2,
+                                random_state=int(cfg["modeling"]["seed"]), stratify=_yy)
+_fte = _feat.set_index("PID").loc[_teidx]
+
+
+def _subgroup_n(X):
+    o = {}
+    o["sex_male"] = int((X["male"] == 1).sum()); o["sex_female"] = int((X["male"] == 0).sum())
+    o["age<50"] = int((X["age"] < 50).sum())
+    o["age50-65"] = int(((X["age"] >= 50) & (X["age"] < 65)).sum())
+    o["age>=65"] = int((X["age"] >= 65).sum())
+    o["bmi<18.5"] = int((X["bmi"] < 18.5).sum())
+    o["bmi18.5-25"] = int(((X["bmi"] >= 18.5) & (X["bmi"] < 25)).sum())
+    o["bmi25-30"] = int(((X["bmi"] >= 25) & (X["bmi"] < 30)).sum())
+    o["bmi>=30"] = int((X["bmi"] >= 30).sum())
+    return o
+
+
+for _k, _v in _subgroup_n(_fte).items():
+    add(f"subgroup.patient.test_n.{_k}", _v, "results/s2_features.csv (reproduced patient split)", S3)
 
 pd.DataFrame(trail).to_csv(os.path.join(RES, "s4_audit_trail.csv"), index=False, encoding="utf-8-sig")
 log(STAGE, f"audit trail -> results/s4_audit_trail.csv ({len(trail)} 行)")

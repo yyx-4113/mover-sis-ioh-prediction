@@ -43,7 +43,7 @@ cohort:
 #   any_below          —— 任一记录分钟低于阈值
 outcomes:
   # Round 1 审查建议值；原 O2（MAP<55>=5min）在网格法下仅 60 事件，不可用作主结局。
-  # ⚠️ 待 protocol 冻结时由作者最终确认。
+  # ✅ 作者签字冻结 2026-10-20（Yongxin Yang）：主结局 = D1（≥10 次 MAP 测量且 <65 占比 ≥30%）。
   primary_id: "D1"
   definitions:
     # ---- MAP 维度：持续型（网格法，NaN=中断）----
@@ -85,7 +85,7 @@ temporal_split:
 features:
   window_minutes: 15                # 预测窗 = [anchor-15min, anchor]，全部特征须早于 anchor
   outcome_source: "post_anchor"     # 建模标签一律取锚点后窗口（s1_labels_postanchor.csv）
-  # 手术分组关键词（冻结 2026-10-19；由 scripts/audit/a6_procedure_groups.py 迭代至 OTHER=2.48%）
+  # 手术分组关键词（冻结 2026-10-19；✅ 作者签字冻结 2026-10-20；由 a6_procedure_groups.py 迭代至 OTHER=2.48%）
   # 用法：文本小写+非字母数字转空格后，按本表顺序做"首个命中"匹配；
   #       仍未命中者走受控模糊兜底（编辑距离<=1、首字符相同、词长>=7），命中日志落
   #       results/s2_fuzzy_match_log.csv；再未命中记 OTHER。
@@ -114,7 +114,8 @@ modeling:
   primary_metric: "AUPRC"
   bootstrap_resamples: 1000
   bootstrap_level: "patient"       # SIS 为 PID 级单记录，仍按患者级报告
-  # 预测锚点（protocol §4 v0.2 新增）：Intubation 事件为主锚，缺失时用 Surgery_start 并报告代理比例
+  # 预测锚点（protocol §4 v0.2 新增）：Intubation 主锚，缺失时 Surgery_start 兜底（代理 18.0%）
+  # ✅ 作者签字冻结 2026-10-20（Yongxin Yang）。
   anchor_event: "Intubation"
   anchor_fallback: "Surgery_start"
 

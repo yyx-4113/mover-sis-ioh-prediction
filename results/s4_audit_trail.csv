@@ -92,3 +92,63 @@ importance.xgboost.sg_GI,48.62272644042969,results/s3_feature_importance.json,py
 importance.xgboost.dbp_mean,45.01955032348633,results/s3_feature_importance.json,python scripts/s3_models.py
 importance.xgboost.art_dbp_min,44.71746826171875,results/s3_feature_importance.json,python scripts/s3_models.py
 importance.xgboost.art_map_mean,43.220542907714844,results/s3_feature_importance.json,python scripts/s3_models.py
+calib.temporal.brier_raw,0.1935,results/s3_calib_dca.json,python scripts/s3_models.py
+calib.temporal.brier_calibrated,0.1217,results/s3_calib_dca.json,python scripts/s3_models.py
+calib.temporal.slope,0.9338,results/s3_calib_dca.json,python scripts/s3_models.py
+calib.temporal.intercept,0.0058,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.patient.net_benefit_model@thr0.10,0.078664,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.patient.net_benefit_model@thr0.15,0.050348,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.patient.net_benefit_positive_up_to_thr,0.58,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.patient.net_benefit_at_crossing,9.9e-05,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.temporal.net_benefit_model@thr0.10,0.08477,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.temporal.net_benefit_model@thr0.15,0.057885,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.temporal.net_benefit_positive_up_to_thr,0.73,results/s3_calib_dca.json,python scripts/s3_models.py
+dca.temporal.net_benefit_at_crossing,0.000163,results/s3_calib_dca.json,python scripts/s3_models.py
+benchmark.map_only.auprc_raw,0.2842,results/s3_calib_dca.json,python scripts/s3_models.py
+benchmark.map_only.auprc_calibrated,0.2694,results/s3_calib_dca.json,python scripts/s3_models.py
+benchmark.map_only.nb_increment_at_0.10,0.0132,results/s3_calib_dca.json,python scripts/s3_models.py
+benchmark.map_only.nb_increment_at_0.15,0.0131,results/s3_calib_dca.json,python scripts/s3_models.py
+subgroup.temporal.sex_male.auprc,0.2667,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.sex_female.auprc,0.3701,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.age<50.auprc,0.3772,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.age50-65.auprc,0.3051,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.age>=65.auprc,0.1944,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.bmi<18.5.auprc,0.3815,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.bmi18.5-25.auprc,0.3537,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.bmi25-30.auprc,0.3059,results/s3_subgroups.json,python scripts/s3_models.py
+subgroup.temporal.bmi>=30.auprc,0.3297,results/s3_subgroups.json,python scripts/s3_models.py
+density.nmap_case_minute_pct,19.89,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.sbp_case_minute_pct,19.99,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.dbp_case_minute_pct,19.95,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.hr_case_minute_pct,94.79,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.spo2_case_minute_pct,96.08,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.nmap_segments_total,637188,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.nmap_segment_length1_share_pct,96.18,results/s1_data_quality.json,python scripts/s1_cohort.py
+density.nmap_per_case_median,33.0,results/s1_data_quality.json,python scripts/s1_cohort.py
+outcome.D1.n_cases_lt10_postanchor_map,1496,results/s1_data_quality.json + results/s1_cohort.json,python scripts/s1_cohort.py
+outcome.D1.conditional_prevalence_ge10meas,1.7527,results/s1_outcomes_postanchor.json + results/s1_data_quality.json,python scripts/s1_cohort.py
+coverage.case_count.anchor,16861,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.demographics,n/a (static),results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.surgery,16861,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.anesthesia_technique,16563,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.medication_pre_anchor,16573,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.non_invasive_bp,16036,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.ventilation,4852,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.invasive_monitoring,2503,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.fluid_bleeding,2794,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+coverage.case_count.laboratories,76,results/s2_data_quality.json / results/s2_features.csv,python scripts/s2_features.py
+cohort.age_median,54.0,results/s2_features.csv,python scripts/s2_features.py
+cohort.male_n,8355,results/s2_features.csv,python scripts/s2_features.py
+cohort.female_n,8506,results/s2_features.csv,python scripts/s2_features.py
+cohort.bmi_median,26.6,results/s2_features.csv,python scripts/s2_features.py
+cohort.preanchor_map_mean_median,87.7,results/s2_features.csv,python scripts/s2_features.py
+cohort.post_anchor_window_median_min,147.0,results/s1_data_quality.json,python scripts/s1_cohort.py
+subgroup.patient.test_n.sex_male,1689,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.sex_female,1684,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.age<50,1402,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.age50-65,1044,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.age>=65,927,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.bmi<18.5,98,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.bmi18.5-25,1202,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.bmi25-30,1064,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py
+subgroup.patient.test_n.bmi>=30,977,results/s2_features.csv (reproduced patient split),python scripts/s3_models.py

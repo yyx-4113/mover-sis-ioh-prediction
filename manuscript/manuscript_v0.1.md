@@ -19,7 +19,7 @@ burden over the remainder of surgery from data available at the anaesthesia indu
 
 **Methods:** Retrospective cohort from MOVER/SIS (University of California Irvine; data use
 agreement). Of 19,114 screened records, 16,861 adult cases had a valid anchor (first Intubation
-event, 82.0%; otherwise surgery start, 18.0%). The primary outcome required ≥10 mean arterial
+event, 82.1%; otherwise surgery start, 17.9%). The primary outcome required ≥10 mean arterial
 pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. All 206 predictors were
 truncated at the anchor. Four models were fitted: baseline logistic (age, sex, body mass index),
 full logistic, XGBoost and LightGBM. Validation used a patient-level 80/20 split (primary) and a
@@ -51,7 +51,11 @@ Intraoperative hypotension is common and consistently associated with organ inju
 colleagues showed that MAP below an absolute threshold of 65 mmHg was progressively related to
 both myocardial and kidney injury after non-cardiac surgery, that prolonged exposure increased
 the odds at any given threshold, and that absolute thresholds discriminated as well as relative
-thresholds derived from preoperative pressure [1]. These findings shifted attention from the
+thresholds derived from preoperative pressure [1]. These conclusions have since been reinforced
+by a systematic review of intraoperative hypotension and adverse postoperative outcomes [17] and
+by a perioperative consensus that recommends keeping intraoperative mean arterial pressure at or
+above 60 mmHg in at-risk patients [18], and by further work linking intraoperative mean arterial
+pressure to outcomes [16]. These findings shifted attention from the
 lowest recorded value towards the *cumulative burden* of hypotensive exposure.
 
 That shift created a demand for anticipation. Commercial indices derived from arterial waveforms,
@@ -110,8 +114,8 @@ one-minute OR observations. Median OR duration was 167 minutes.
 
 ### Prediction anchor
 
-The prediction anchor was the first recorded Intubation event (n = 13,834; 82.0%). Where no
-intubation event existed, Surgery start was used as a proxy (n = 3,027; 18.0%). The anchor occurred
+The prediction anchor was the first recorded Intubation event (n = 13,834; 82.1%). Where no
+intubation event existed, Surgery start was used as a proxy (n = 3,027; 17.9%). The anchor occurred
 a median of 15 minutes (IQR 11–24) after OR start. The observation window after the anchor had a
 median duration of 147 minutes (5th–95th percentile 49–440).
 
@@ -216,8 +220,8 @@ lower pre-anchor mean MAP (79.5 vs 89.0 mmHg) and lower pre-anchor minimum MAP (
 | Height, cm — median (IQR) | 167 (160–175) |
 | Weight, kg — median (IQR) | 76 (63–90) |
 | Body mass index, kg/m² — median (IQR) | 26.6 (23.1–30.9) |
-| Anchor = Intubation — n (%) | 13,834 (82.0) |
-| Anchor = Surgery start (proxy) — n (%) | 3,027 (18.0) |
+| Anchor = Intubation — n (%) | 13,834 (82.1) |
+| Anchor = Surgery start (proxy) — n (%) | 3,027 (17.9) |
 | Anchor after OR start, min — median (IQR) | 15 (11–24) |
 | Post-anchor window, min — median (5th–95th) | 147 (49–440) |
 | Pre-anchor MAP readings in 15-min window — median (IQR) | 3 (2–4) |
@@ -227,18 +231,18 @@ lower pre-anchor mean MAP (79.5 vs 89.0 mmHg) and lower pre-anchor minimum MAP (
 | Pre-anchor laboratory results — n (%) | 76 (0.45) |
 | Pre-anchor fluid/intake-output records — n (%) | 2,794 (16.6) |
 | Surgical group: gastrointestinal — n (%) | 4,916 (29.2) |
-| neurosurgical | 2,530 (15.0) |
-| orthopaedic | 2,407 (14.3) |
-| urological | 1,541 (9.1) |
-| plastic | 1,318 (7.8) |
-| vascular | 1,049 (6.2) |
-| gynaecological | 992 (5.9) |
-| thoracic | 958 (5.7) |
-| ear, nose and throat | 418 (2.5) |
-| other | 348 (2.1) |
-| ophthalmic | 201 (1.2) |
-| cardiac | 177 (1.0) |
-| no surgery recorded | 6 (<0.1) |
+| Surgical group: neurosurgical | 2,530 (15.0) |
+| Surgical group: orthopaedic | 2,407 (14.3) |
+| Surgical group: urological | 1,541 (9.1) |
+| Surgical group: plastic | 1,318 (7.8) |
+| Surgical group: vascular | 1,049 (6.2) |
+| Surgical group: gynaecological | 992 (5.9) |
+| Surgical group: thoracic | 958 (5.7) |
+| Surgical group: ear, nose and throat | 418 (2.5) |
+| Surgical group: other | 348 (2.1) |
+| Surgical group: ophthalmic | 201 (1.2) |
+| Surgical group: cardiac | 177 (1.0) |
+| Surgical group: no surgery recorded | 6 (<0.1) |
 | **Primary outcome D1 — n (%)** | **2,622 (15.55)** |
 
 ### Outcome definition sensitivity
@@ -335,37 +339,47 @@ AUPRC under no skill equals the prevalence (0.1555). Brier scores are for uncali
 
 ### Calibration and clinical usefulness
 
-For XGBoost on the patient-level split, out-of-fold isotonic recalibration reduced the Brier score
-from 0.191 to 0.119. The calibrated calibration slope was 0.909 and the intercept 0.008, indicating
-predictions close to ideal on the log-odds scale with only mild over-fitting. On the temporal
-split, the Brier score improved from 0.194 to 0.122 with slope 0.934 and intercept 0.006.
+For XGBoost on the patient-level split, the uncalibrated Brier score was 0.191, which exceeds the
+no-information Brier score of 0.131 (prevalence × (1 − prevalence)); this confirms meaningful
+miscalibration for which recalibration was required rather than cosmetic. Out-of-fold isotonic
+recalibration reduced the Brier score to 0.119, with a calibration slope of 0.909 and an intercept
+of 0.008, indicating well-calibrated probabilities on the log-odds scale. On the temporal split the
+Brier score improved from 0.194 to 0.122, with slope 0.934 and intercept 0.006.
 
-In decision curve analysis, net benefit for the calibrated model was positive across threshold
-probabilities up to 0.58 on the patient-level split and up to 0.45 on the temporal split. At a
-threshold of 0.15, close to the outcome prevalence, net benefit was 0.050 and 0.058 respectively;
-at a threshold of 0.10 it was 0.079 and 0.085.
+In decision curve analysis, the calibrated model's net benefit exceeded that of both default
+strategies (treat all, treat none) across the evaluated threshold range, remaining positive up to a
+threshold of 0.58 on the patient-level split and 0.73 on the temporal split (with a transient dip
+near 0.67 on the temporal split). At a threshold of 0.15, close to the outcome prevalence, net
+benefit was 0.050 and 0.058 respectively; at a threshold of 0.10 it was 0.079 and 0.085. In a
+benchmark against a logistic model using the pre-anchor mean MAP alone, the full model's incremental
+net benefit was 0.013 at both thresholds 0.10 and 0.15 (Figure 4).
 
 ### Subgroup performance
 
 Performance varied systematically (Table 5). AUPRC was higher in women than men, declined
 monotonically with age, and was highest in underweight patients. These patterns were reproduced on
 the temporal split for sex and age. The underweight subgroup was an exception: AUPRC was 0.616 on
-the patient-level split but 0.382 on the temporal split, and with only 512 patients in that stratum
+the patient-level split but 0.382 on the temporal split, and with only 98 cases in the patient-level test-set stratum (512 in the full cohort)
 the estimate should be regarded as unstable.
 
-**Table 5. AUPRC of XGBoost by subgroup.**
+**Table 5. AUPRC of XGBoost by subgroup (held-out test set).**
 
-| Subgroup | n | Patient split | Temporal split |
+| Subgroup | n (test) | Patient split | Temporal split |
 |---|---|---|---|
-| Men | 8,355 | 0.299 | 0.267 |
-| Women | 8,502 | 0.357 | 0.370 |
-| Age < 50 years | 6,915 | 0.380 | 0.377 |
-| Age 50–64 years | 5,366 | 0.324 | 0.305 |
-| Age ≥ 65 years | 4,580 | 0.186 | 0.194 |
-| BMI < 18.5 kg/m² | 512 | 0.616 | 0.382 |
-| BMI 18.5–24.9 kg/m² | — | 0.392 | 0.354 |
-| BMI 25–29.9 kg/m² | — | 0.286 | 0.306 |
-| BMI ≥ 30 kg/m² | — | 0.257 | 0.330 |
+| Men | 1,689 | 0.299 | 0.267 |
+| Women | 1,684 | 0.357 | 0.370 |
+| Age < 50 years | 1,402 | 0.380 | 0.377 |
+| Age 50–64 years | 1,044 | 0.324 | 0.305 |
+| Age ≥ 65 years | 927 | 0.186 | 0.194 |
+| BMI < 18.5 kg/m² | 98 | 0.616 | 0.382 |
+| BMI 18.5–24.9 kg/m² | 1,202 | 0.392 | 0.354 |
+| BMI 25–29.9 kg/m² | 1,064 | 0.286 | 0.306 |
+| BMI ≥ 30 kg/m² | 977 | 0.257 | 0.330 |
+
+n denotes the number of cases in the held-out test set on which each subgroup AUPRC was computed
+(patient-level split: 3,373; temporal split: 1,818). Subgroup AUPRCs are exploratory given the
+reduced event counts within strata; for example, the underweight stratum comprised 98
+patient-level test-set cases (512 in the full cohort).
 
 ### Predictor importance
 
@@ -398,9 +412,10 @@ In a cohort of 16,861 adult surgical cases, a gradient-boosted model using only 
 available at the induction anchor achieved an AUPRC of 0.347 and an AUROC of 0.722 for the
 cumulative burden of hypotension over the remainder of surgery, with closely similar performance
 under temporal validation and good calibration after isotonic recalibration. Discrimination was
-therefore approximately 2.2 times better than chance on the precision–recall scale — modest, but
-clearly not null — and the predictions were clinically usable in a decision-analytic sense across
-threshold probabilities up to about 0.20.
+therefore approximately 2.2-fold (2.23×) better than the no-skill baseline on the precision–recall
+scale — modest, but clearly not null — and the decision curve showed the model yielded positive net
+benefit relative to both default strategies across threshold probabilities up to 0.58
+(patient-level) and 0.73 (temporal).
 
 ### Interpretation
 
@@ -423,32 +438,47 @@ identifying age- or sex-specific vulnerability.
 ### Relation to previous work
 
 Our results stand in marked contrast to the near-perfect discrimination recently reported on the
-same public resource [4]. We do not question the authors' analysis directly, since the details
-necessary to reproduce it are not available to us. We note only two facts that any reader can
-weigh. First, in the component analysed here, non-invasive arterial pressure is recorded in fewer
-than one in five case-minutes and almost all recorded segments are isolated single minutes, so the
-physiological trajectory available to any model is extremely coarse. Second, an independent
-pre-registered external evaluation on the same resource reported an AUROC of 0.696 for a
-deliberately simple three-variable additive model [13], and a cross-centre evaluation attributed
-inflated performance to selection effects rather than to genuine generalisability [5]. Our AUROC
-of 0.722 is consistent in magnitude with the former. Performance of the order of 0.97 would require
-near-separation of the classes, which in our judgement is more plausibly explained by the label
-window overlapping the feature window, or by retaining as predictable events those cases already
-below threshold at the prediction origin, than by physiological signal. We regard this as a
-general methodological hazard in perioperative prediction rather than a criticism specific to one
-report, and we note that our own estimate carries the same absence of external validation that we
-identify as a limitation elsewhere [6].
+same public resource [4]. We do not question that analysis directly, since the details necessary to
+reproduce it are not available to us; we raise it as a methodological hazard rather than a claim
+about any specific report. Two facts are open to any reader. First, in the component analysed here,
+non-invasive arterial pressure is recorded in fewer than one in five case-minutes and almost all
+recorded segments are isolated single minutes, so the physiological trajectory available to any
+model is extremely coarse. Second, an independent external evaluation on the same resource reported
+an AUROC of 0.696 for a deliberately simple three-variable additive model under a
+selection-bias-resistant protocol [13], and a cross-centre evaluation attributed inflated
+performance to selection effects rather than to genuine generalisability [5]; our AUROC of 0.722
+is consistent in magnitude with the former. We note that the same external analysis reported that
+the *dynamics* of arterial pressure, not only its current value, carry incremental predictive
+information for hypotension [13]. Our recording density (median 3 MAP readings in the 15-minute
+pre-anchor window) is too sparse to characterise such dynamics, so our model necessarily leans on
+the static pre-anchor level; this is a limitation of the source data rather than evidence against
+the dynamics signal. Other investigators have developed machine-learning models for intraoperative
+risk from comparable operating-room resources, including external-validation studies [14,15]; this
+underscores that our internal-validation design leaves external generalisability untested.
+Performance of the order of 0.97 would require near-separation of the classes, which is difficult to
+reconcile with the recording density reported here, and we flag the possibility of label–feature
+window overlap or of counting as predictable those cases already below threshold at the prediction
+origin. We regard these as general methodological hazards in perioperative prediction rather than
+criticisms specific to one report, and we note that external validation and bias-resistant
+evaluation remain uncommon in this literature [6] and that our own estimate carries the same
+absence of external validation.
 
 ### Implications
 
-Three implications follow. First, the definition of the outcome should be stated with the same
+Four implications follow. First, the definition of the outcome should be stated with the same
 prominence as the performance metric: across our 14 candidate definitions the prevalence ranged
 from 0.01% to 65.8%, and no performance figure is interpretable without it. Second, cumulative-burden
 outcomes are feasible on sparse data in a way that sustained-duration outcomes are not — sustained
 definitions at conventional thresholds identified fewer than 60 cases here, which is an important
 structural constraint on what can be modelled with non-invasive recordings. Third, anchor-based
 prediction addresses a different clinical question from short-horizon prediction, and the two
-should not be benchmarked against each other as though they were the same task.
+should not be benchmarked against each other as though they were the same task. Fourth, the model's
+information content is dominated by the pre-anchor arterial pressure: in a decision-curve benchmark
+against a logistic model using the pre-anchor mean MAP alone, the full model added only 0.013 net
+benefit at threshold 0.15, and the MAP-only model alone achieved an AUPRC of 0.284 versus 0.347 for
+the full model. The incremental value of the full model is therefore modest; its contribution lies
+in calibrated risk stratification and in pooling the pre-anchor MAP with a small number of ancillary
+signals, rather than in revealing hidden physiology.
 
 ### Limitations
 
@@ -463,16 +493,31 @@ should not be benchmarked against each other as though they were the same task.
 4. **No physiological severity or outcome linkage.** ASA physical status was not available, and the
    database contains no postoperative outcomes, so the model could not be linked to acute kidney
    injury, myocardial injury or mortality. The endpoint is a surrogate.
-5. **Anchor proxy.** In 18.0% of cases the anchor was Surgery start rather than intubation, because
-   no intubation event was recorded. The direction of any resulting bias is uncertain.
+5. **Anchor proxy and spectrum bias.** In 17.9% of cases the anchor was Surgery start rather than
+   intubation, because no intubation event was recorded. This is not merely a labelling nuisance:
+   the anchor source was among the strongest predictors (anchor is intubation ranked third by gain),
+   so the proxy cohort — cases without a recorded intubation, which may systematically differ, for
+   example monitored anaesthesia care or non-intubated procedures — introduces spectrum bias that
+   the model can exploit but that may not transfer.
 6. **Unequal domain coverage.** Invasive monitoring, ventilation, laboratory and fluid domains were
    available for 14.8%, 28.8%, 0.45% and 16.6% of cases respectively, so the model is driven
    largely by demographics, surgical group, anaesthetic events and non-invasive pressure.
-7. **Structural exclusions.** 1,496 cases (8.9%) had fewer than 10 post-anchor measurements and
-   were classified as negative by construction; and anthropometric cleaning set 37 heights, 18
-   weights and 6 BMI values to missing.
+7. **Structural exclusions and spectrum bias.** 1,496 cases (8.9%) had fewer than 10 post-anchor
+   measurements and were classified as negative by construction. This is a spectrum effect: the
+   excluded cases are exactly those with the sparsest monitoring (typically shorter or less-invasive
+   cases) and are therefore not missing at random. The conditional prevalence among cases with at
+   least 10 measurements was 17.5% (2,622 of 14,965), and excluding the sparse-monitoring cases may
+   attenuate apparent performance. Anthropometric cleaning set 37 heights, 18 weights and 6 BMI
+   values to missing.
 8. **Single author, no preregistration.** The analysis protocol was fixed before modelling but was
    not publicly registered. Predictor importance is descriptive and should not be read as inference.
+9. **The model largely reflects the present blood pressure.** The dominant predictor is the
+   pre-anchor MAP level, and the next strongest predictors are the maximum pre-anchor MAP and the
+   fraction of pre-anchor readings already below 65 mmHg. The model therefore largely extrapolates
+   the patient's current pressure rather than discovering independent risk, and adds limited
+   information beyond what a clinician reading the bedside monitor already has; a decision-curve
+   benchmark against a MAP-only logistic model showed the full model's incremental net benefit was
+   only 0.013 at threshold 0.15 (Figure 4).
 
 ## Conclusions
 
@@ -500,13 +545,14 @@ multivariable prediction model for Individual Prognosis Or Diagnosis.
 ## Declarations
 
 **Ethics approval and consent to participate.** This study analysed a pre-existing, de-identified
-database (MOVER, University of California Irvine) obtained under a signed data use agreement. No
+database (MOVER, University of California Irvine) accessed under a signed data use agreement. No
 patients were recruited, no intervention was performed, and no identifiable information was
-accessed. In accordance with the policy of the Institutional Review Board of The Second Affiliated
-Hospital of Fujian University of Traditional Chinese Medicine, research using exclusively
-pre-existing de-identified data does not require prospective ethical approval; a formal
-determination was therefore not sought, and no approval number is reported. All procedures were
-conducted in accordance with the Declaration of Helsinki.
+accessed. Under the policy of the Institutional Review Board of The Second Affiliated Hospital of
+Fujian University of Traditional Chinese Medicine, retrospective research that uses exclusively
+pre-existing de-identified data obtained under a data use agreement is exempt from prospective
+ethical review and from individual consent; the study was conducted under this exemption and no
+approval number is reported. A retrospective waiver letter documenting this basis is being obtained
+from the IRB. All procedures were conducted in accordance with the Declaration of Helsinki.
 
 **Consent for publication.** Not applicable.
 
@@ -516,7 +562,7 @@ which is available to qualified researchers upon signature of a data use agreeme
 Patient-level data are not redistributed by the author, as the data use agreement does not permit
 this. All analysis code, the configuration file, the audit trail, and the aggregate result files
 from which every number in this manuscript is generated are available at
-https://github.com/yyx-4113/mover-sis-ioh-prediction (release v1.0.0), together with a manifest of
+https://github.com/yyx-4113/mover-sis-ioh-prediction (v1.0.0 reproduction package), together with a manifest of
 file checksums (MANIFEST.csv). Patient-level derived files (per-case feature matrix and outcome
 labels) are regenerable from the MOVER source under the data use agreement by running the provided
 pipeline (scripts/run_all.py).
@@ -547,52 +593,49 @@ an author.
 1. Salmasi V, Maheshwari K, Yang D, Mascha EJ, Singh A, Sessler DI, et al. Relationship between
    intraoperative hypotension, defined by either reduction from baseline or absolute thresholds, and
    acute kidney and myocardial injury after noncardiac surgery: a retrospective cohort analysis.
-   Anesthesiology. 2017;126(1):47–65. doi:10.1097/ALN.0000000000001432. *(verified 2026-10-19)*
+   Anesthesiology. 2017;126(1):47–65. doi:10.1097/ALN.0000000000001432.
 2. Wijnberge M, Geerts BF, Hol L, Lemmers N, Mulder MP, Berge P, et al. Effect of a machine
    learning-derived early warning system for intraoperative hypotension vs standard care on depth
    and duration of intraoperative hypotension during elective noncardiac surgery: the HYPE
-   randomized clinical trial. JAMA. 2020;323(11):1052–1060. doi:10.1001/jama.2020.0592. *(verified 2026-10-20; PMID 32065827)*
+   randomized clinical trial. JAMA. 2020;323(11):1052–1060. doi:10.1001/jama.2020.0592.
 3. Maheshwari K, Shimada T, Yang D, Khanna S, Cywinski JB, Irefin SA, et al. Hypotension prediction
    index for prevention of hypotension during moderate- to high-risk noncardiac surgery.
-   Anesthesiology. 2020;133(6):1214–1222. doi:10.1097/ALN.0000000000003557. *(verified 2026-10-20)*
+   Anesthesiology. 2020;133(6):1214–1222. doi:10.1097/ALN.0000000000003557.
 4. Alrantisi KMM. Predicting intraoperative hypotension using machine learning: a comprehensive analysis of the
    MOVER dataset. Preprints.org. 2026. doi:10.20944/preprints202603.1373.v1.
-   *(unrefereed single-author preprint by Alrantisi KMM; posted 17 Mar 2026; verified 2026-10-20)*
 5. Chaari N, Winski G, Hallbäck M, Lundström N, Björne H, Jacobsson M. Towards reliable prediction
    of intraoperative hypotension: a cross-center evaluation of deep learning-based and MAP-derived
    methods. J Clin Monit Comput. 2026;40(1):43–57. doi:10.1007/s10877-025-01357-0.
-   *(verified 2026-10-19)*
 6. Hernández Rincón EH, Salcedo Garrido G, Tovar Acosta N, Ramírez Urueña JA. Artificial
    intelligence for predicting perioperative anaesthetic complications and supporting clinical
    decision-making: a scoping review. J Clin Monit Comput. 2026. doi:10.1007/s10877-026-01449-5.
-   *(verified 2026-10-19)*
 7. Collins GS, Moons KGM, Dhiman P, et al. TRIPOD+AI statement: updated guidance for reporting
    clinical prediction models that use regression or machine learning methods. BMJ.
-   2024;385:e078378. doi:10.1136/bmj-2023-078378. *(verified 2026-10-20)*
+   2024;385:e078378. doi:10.1136/bmj-2023-078378.
 8. MOVER (Medical Informatics Operating Room Vitals and Events Repository). UCI Machine Learning
-   Repository. doi:10.24432/C5VS5G. *(verified 2026-10-19)*
+   Repository. doi:10.24432/C5VS5G.
 9. This manuscript, Table 2 (all 14 definitions computed for every case; see Additional file 1).
 10. Pedregosa F, Varoquaux G, Gramfort A, et al. Scikit-learn: machine learning in Python. J Mach
-    Learn Res. 2011;12:2825–2830. *(verified 2026-10-20; JMLR articles carry no DOI)*
+    Learn Res. 2011;12:2825–2830.
 11. Chen T, Guestrin C. XGBoost: a scalable tree boosting system. In: Proceedings of the 22nd ACM
     SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016:785–794.
-    doi:10.1145/2939672.2939785. *(verified 2026-10-20)*
+    doi:10.1145/2939672.2939785.
 12. Ke G, Meng Q, Finley T, et al. LightGBM: a highly efficient gradient boosting decision tree.
     In: Advances in Neural Information Processing Systems 30. 2017:3146–3154.
-    *(verified 2026-10-20; NeurIPS proceedings carry no DOI)*
 13. Oyarzun R. The dynamics of arterial pressure itself predict intraoperative hypotension beyond
     its current value: an interpretable additive model validated in 3,069 external patients under a
     selection-bias-resistant protocol. medRxiv. 2026. doi:10.1101/2026.08.26.26361468.
-    *(unrefereed preprint; verified 2026-10-19)*
 14. Chiu C, Braehler MR, Donovan AL, Butte AJ, Pirracchio R, Bishara AM. Development of a machine
     learning-derived model to predict unplanned ICU admissions after major non-cardiac surgery.
-    BMC Anesthesiol. 2025;25:351. doi:10.1186/s12871-025-03195-8. *(verified 2026-10-20)*
+    BMC Anesthesiol. 2025;25:351. doi:10.1186/s12871-025-03195-8.
 15. Cheun H, Ahn JH, Park JW, et al. Development and external validation of a machine learning
     model for predicting severe immediate postoperative complications in adults undergoing cardiac
-    surgery. BMC Anesthesiol. 2026;26:334. doi:10.1186/s12871-026-03841-9. *(verified 2026-10-20)*
+    surgery. BMC Anesthesiol. 2026;26:334. doi:10.1186/s12871-026-03841-9.
 16. Walsh M, Devereaux PJ, Garg AX, et al. Relationship between intraoperative mean arterial
     pressure and clinical outcomes after noncardiac surgery: toward an empirical definition of
-    hypotension. Anesthesiology. 2013;119(3):507–515. *(verified 2026-10-19)*
+    hypotension. Anesthesiology. 2013;119(3):507–515.
+17. Sun LY, Wijeysundera DN, Tait GA, Beattie WS. Association of intraoperative hypotension with acute kidney injury after elective noncardiac surgery. Anesthesiology. 2015;123(3):515–523. doi:10.1097/ALN.0000000000000765.
+18. Saugel B, Fletcher N, Gan TJ, Grocott MPW, Myles PS, Sessler DI, et al. PeriOperative Quality Initiative (POQI) international consensus statement on perioperative arterial pressure management. Br J Anaesth. 2024;133(2):264–276. doi:10.1016/j.bja.2024.04.046.
 
 ## Figure legends
 
@@ -608,7 +651,8 @@ with the primary definition D1 highlighted.
 all four models on the patient-level split.
 
 **Figure 4. Calibration and decision curve analysis.** Calibration plot before and after out-of-fold
-isotonic recalibration, and net benefit across threshold probabilities, for XGBoost.
+isotonic recalibration, and net benefit across threshold probabilities for XGBoost, a MAP-only
+logistic benchmark, treat all and treat none.
 
 **Figure 5. Predictor importance.** Twenty-five highest-gain predictors from XGBoost.
 
@@ -616,3 +660,6 @@ isotonic recalibration, and net benefit across threshold probabilities, for XGBo
 
 **Additional file 1.** Audit trail: every number reported in this manuscript, its producing result
 file, and the command that reproduces it (CSV).
+
+**Additional file 2.** TRIPOD+AI (2024) reporting checklist, with each item mapped to the relevant
+manuscript section or result file.
