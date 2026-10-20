@@ -1,11 +1,26 @@
 # Submission bundle - BMC Anesthesiology
 
-**Submission site (Editorial Manager):** https://www.editorialmanager.com/BANE
-**Journal home page:** https://bmcanesthesiol.biomedcentral.com/
+**Submission site (SNAPP, Springer Nature Article Processing Platform):** https://submission.springernature.com/new-submission/12871/3
+**Journal home page:** https://link.springer.com/journal/12871
 **ISSN:** 1471-2253
+**Springer Nature journal ID:** 12871
+
+## How to reach the submission site
+
+Open the journal home page and click **Submit your manuscript**; or paste the
+direct link above. Either route lands on the Springer Nature sign-in page, which
+states "continue with your submission to BMC Anesthesiology".
+
+Sign in with **ORCID** (recommended, it links the submission to
+0009-0004-9698-6552), or with a Springer Nature account, or with Google. The
+account is created on first use.
+
+Do **not** use an `editorialmanager.com` link for this journal. BMC titles have
+moved off Editorial Manager onto SNAPP, and the old Editorial Manager address no
+longer accepts new submissions.
 
 Everything needed for the online submission is in this folder.
-Upload order in the Editorial Manager wizard:
+Upload order in the SNAPP submission wizard:
 
 | Step in wizard | File in this folder |
 |---|---|

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Build the BMC Anesthesiology submission bundle.
 
-Assembles, into a single folder, everything the Editorial Manager submission
-wizard asks for:
+Assembles, into a single folder, everything the SNAPP submission
+wizard (Springer Nature Article Processing Platform) asks for:
 
     submission/
       00_README_submission_checklist.md      what to upload, where, and the journal URL
@@ -30,8 +30,10 @@ OUT = os.path.join(ROOT, "submission")
 FIGDIR = os.path.join(OUT, "03_Figures")
 
 JOURNAL = "BMC Anesthesiology"
-SUBMIT_URL = "https://www.editorialmanager.com/BANE"
-JOURNAL_URL = "https://bmcanesthesiol.biomedcentral.com/"
+# BMC Anesthesiology migrated from Editorial Manager to SNAPP (Springer Nature
+# Article Processing Platform). 12871 is the Springer Nature journal ID.
+SUBMIT_URL = "https://submission.springernature.com/new-submission/12871/3"
+JOURNAL_URL = "https://link.springer.com/journal/12871"
 ISSN = "1471-2253"
 
 
@@ -216,12 +218,27 @@ def build():
 
 README = """# Submission bundle - {journal}
 
-**Submission site (Editorial Manager):** {url}
+**Submission site (SNAPP, Springer Nature Article Processing Platform):** {url}
 **Journal home page:** {jurl}
 **ISSN:** {issn}
+**Springer Nature journal ID:** 12871
+
+## How to reach the submission site
+
+Open the journal home page and click **Submit your manuscript**; or paste the
+direct link above. Either route lands on the Springer Nature sign-in page, which
+states "continue with your submission to {journal}".
+
+Sign in with **ORCID** (recommended, it links the submission to
+0009-0004-9698-6552), or with a Springer Nature account, or with Google. The
+account is created on first use.
+
+Do **not** use an `editorialmanager.com` link for this journal. BMC titles have
+moved off Editorial Manager onto SNAPP, and the old Editorial Manager address no
+longer accepts new submissions.
 
 Everything needed for the online submission is in this folder.
-Upload order in the Editorial Manager wizard:
+Upload order in the SNAPP submission wizard:
 
 | Step in wizard | File in this folder |
 |---|---|
