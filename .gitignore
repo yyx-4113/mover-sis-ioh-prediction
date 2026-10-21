@@ -42,3 +42,6 @@ scripts/results/
 results/s2_features*.csv
 results/s3_test_predictions_*.csv
 results/s6_external_grid_labels.csv
+
+# Local pre-revision backups of the manuscript (never published)
+backup/
