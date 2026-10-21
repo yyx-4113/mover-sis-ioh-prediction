@@ -73,7 +73,7 @@ under `results/` directly.
 
 ## Key design decisions (frozen)
 
-- **Primary outcome D1** — cumulative-burden definition: at least 10 MAP measurements after the
+- **Primary outcome D1** — exposure-fraction definition: at least 10 MAP measurements after the
   prediction anchor, of which at least 30% are below 65 mmHg (aligned with Salmasi et al., 2017).
 - **Prediction anchor** — first recorded Intubation event; Surgery_start used as proxy when no
   intubation event exists (18.0% of cases). The outcome window is the remainder of surgery

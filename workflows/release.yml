@@ -17,7 +17,7 @@ jobs:
           python-version: '3.13'
       - name: Syntax-check pipeline scripts
         run: |
-          python -m py_compile scripts/*.py scripts/audit/*.py scripts/results/*.py
+          python -m py_compile scripts/*.py scripts/audit/*.py
       - name: Validate config YAML parses
         run: |
           python -c "import yaml,sys; yaml.safe_load(open('config/config.yaml')); print('config.yaml OK')"

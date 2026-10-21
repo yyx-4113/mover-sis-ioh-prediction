@@ -26,3 +26,19 @@ results/ext/vitaldb_predictions.csv
 
 # Stray reserved-name artifact (Windows device name); not part of the package
 /nul
+
+# ---- v1.0.1 package hygiene (Round-6 T0-8) ----
+# Internal working files (kept in the working directory, never published)
+review/
+STATUS.md
+NOTES_zh.md
+external_validation_plan.md
+results/_round1_subgroup_n.json
+manuscript/irb_waiver_request_template.md
+manuscript/cover_letter_bmc_anesthesiology.docx
+scripts/results/
+
+# Per-case derived data (regenerable from MOVER/VitalDB under DUA; not redistributed)
+results/s2_features*.csv
+results/s3_test_predictions_*.csv
+results/s6_external_grid_labels.csv

@@ -1,4 +1,4 @@
-# Prediction of cumulative intraoperative hypotension burden from data available at anaesthesia induction: development and internal validation in MOVER/SIS with an external transportability check in VitalDB
+# Prediction of intraoperative hypotension exposure from data available at anaesthesia induction: development and internal validation in MOVER/SIS with an external transportability check in VitalDB
 
 **Yongxin Yang**¹  ORCID 0009-0004-9698-6552
 
@@ -11,13 +11,13 @@ Correspondence: Yongxin Yang, 960856791@qq.com
 
 ## Abstract
 
-**Background:** Intraoperative hypotension is associated with kidney and myocardial injury. Machine-learning performance estimates vary widely. We developed and internally validated a model predicting cumulative hypotension burden over the remainder of surgery from data available at the anaesthesia induction anchor, and examined its transportability in an external cohort.
+**Background:** Intraoperative hypotension is associated with kidney and myocardial injury. Machine-learning performance estimates vary widely. We developed and internally validated a model predicting hypotensive exposure (at least 30% of recorded post-anchor mean arterial pressure readings below 65 mmHg) over the remainder of surgery from data available at the anaesthesia induction anchor, and examined its transportability in an external cohort.
 
 **Methods:** Retrospective cohort from MOVER/SIS. Of 19,114 screened records, 16,861 adult cases had a valid anchor (first intubation event, 82.0%; otherwise surgery start, 18.0%). The primary outcome required ≥10 mean arterial pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. Predictors were truncated at the anchor; four models were fitted (baseline, full logistic, XGBoost, LightGBM). Validation used patient-level (primary) and temporal (secondary) splits; the unchanged MOVER core model was also applied to the VitalDB arterial cohort (n = 3,735; anchor adapted from intubation to operation start; no refitting) as a transportability check. AUPRC was the primary metric; AUROC and Brier score were secondary; 95% confidence intervals came from 1,000 bootstrap resamples; isotonic calibration and decision curve analysis were performed.
 
 **Results:** The outcome occurred in 2,622 of 16,861 cases (15.55%). XGBoost achieved AUPRC 0.347 (95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split, versus 0.233 (baseline), 0.301 (full logistic) and 0.338 (LightGBM); on the temporal split it achieved 0.339 (0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191 to 0.119. Subgroup AUPRC tracked stratum prevalence; pre-anchor mean MAP was the dominant predictor. Externally (VitalDB, prevalence 5.73%), the unchanged model retained discrimination (AUROC 0.744, 95% CI 0.705–0.778; AUPRC 0.158, 0.126–0.202) but probabilities were uncalibrated; the 53-feature internal AUROC was 0.698–0.710, confirming transportability rather than like-for-like validation.
 
-**Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest but non-null discrimination for cumulative hypotension burden and was well calibrated. An external transportability check in VitalDB supported transfer of ranking but not of absolute probabilities, requiring local recalibration before clinical use.
+**Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest but non-null discrimination for intraoperative hypotensive exposure and was well calibrated. An external transportability check in VitalDB supported transfer of ranking but not of absolute probabilities, requiring local recalibration before clinical use.
 
 **Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean arterial pressure; perioperative medicine; calibration; TRIPOD
 
@@ -59,8 +59,8 @@ hypotensive at the prediction origin are excluded and the grey zone is retained 
 scoping review of perioperative artificial intelligence found external validation and
 bias-resistant evaluation to be uncommon [6].
 
-We therefore set out to develop and internally validate a model for the *cumulative burden* of
-hypotension over the remainder of surgery, using only information available at the anaesthesia
+We therefore set out to develop and internally validate a model for intraoperative
+hypotensive exposure over the remainder of surgery, using only information available at the anaesthesia
 induction anchor, to examine its transportability in an independent external cohort, and to report
 it under an explicit leakage audit, with calibration and decision-analytic evaluation, and with an
 honest account of what the recording density of the source data permits.
@@ -530,15 +530,16 @@ We tested the main findings against eight perturbations; the results are in Tabl
 ### Principal findings
 
 In a cohort of 16,861 adult surgical cases, a gradient-boosted model using only information
-available at the induction anchor achieved an AUPRC of 0.347 and an AUROC of 0.722 for the
-cumulative burden of hypotension over the remainder of surgery, with closely similar performance
+available at the induction anchor achieved an AUPRC of 0.347 and an AUROC of 0.722 for
+intraoperative hypotensive exposure over the remainder of surgery, with closely similar performance
 under temporal validation and good calibration after isotonic recalibration. Discrimination was
 therefore approximately 2.2-fold (2.23×) better than the no-skill baseline on the precision–recall
-scale (modest, but clearly not null), and the decision curve showed the model yielded positive net
-benefit relative to both default strategies across threshold probabilities up to approximately 0.58
-(patient-level) and 0.45 (temporal); on the temporal split the net benefit turns negative beyond
-0.45 except for a narrow positive interval between 0.66 and 0.73, where its magnitude is negligible.
-The decision-relevant region is therefore thresholds near to moderately above the outcome
+scale (modest, but clearly not null), and the decision curve showed the model's net benefit over
+both default strategies was positive across most of the evaluated threshold range but very small
+in absolute terms (below 0.01 at the decision-relevant thresholds of 0.10–0.30, and at most
+9.9×10⁻⁵ at 0.58 on the patient-level split); on the temporal split net benefit was positive up to
+0.45, then negative except for a narrow interval between 0.66 and 0.73, where its magnitude is
+negligible. The decision-relevant region is therefore thresholds near to moderately above the outcome
 prevalence (roughly 0.10–0.30), where the calibrated probabilities
 could support a vasopressor-readiness or enhanced-monitoring decision; the specific operating point
 remains a clinical judgement to be informed by external validation rather than settled here.
@@ -598,7 +599,7 @@ bias-resistant evaluation remain uncommon in this literature [6].
 
 Four implications follow. First, the definition of the outcome should be stated with the same
 prominence as the performance metric: across our 14 candidate definitions the prevalence ranged
-from 0.01% to 65.8%, and no performance figure is interpretable without it. Second, cumulative-burden
+from 0.01% to 65.8%, and no performance figure is interpretable without it. Second, exposure-fraction
 outcomes are feasible on sparse data in a way that sustained-duration outcomes are not. Sustained
 definitions at conventional thresholds identified fewer than 60 cases here, which is a
 structural constraint on what can be modelled with non-invasive recordings. Third, anchor-based
@@ -735,8 +736,8 @@ in perioperative hypotension prediction and that hold independently of the discr
 ## Conclusions
 
 Using only data available at the anaesthesia induction anchor, a gradient-boosted model achieved
-modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for cumulative intraoperative
-hypotension burden, reproduced under temporal validation and well calibrated after isotonic
+modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for intraoperative
+hypotensive exposure, reproduced under temporal validation and well calibrated after isotonic
 recalibration. In an independent external cohort (VitalDB, n = 3,735) the same model retained
 discrimination (AUROC 0.744) without refitting. This is a transportability check rather than a like-for-like
 validation, because the external anchor (operation start) postdates induction and the external
@@ -782,7 +783,7 @@ Lee et al. (2022), doi:10.1038/s41597-022-01411-5. Patient-level data are not re
 author, as the MOVER data use agreement does not permit this. All analysis code, the configuration
 file, the audit trail, and the aggregate result files
 from which every number in this manuscript is generated are available at
-https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.0 (v1.0.0 reproduction package), together with a manifest of
+https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.1 (v1.0.1 reproduction package), together with a manifest of
 file checksums (MANIFEST.csv). Patient-level derived files (per-case feature matrix and outcome
 labels) are regenerable from the MOVER source under the data use agreement by running the provided
 pipeline (scripts/run_all.py).
