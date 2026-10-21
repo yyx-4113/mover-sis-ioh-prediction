@@ -280,7 +280,7 @@ lower pre-anchor mean MAP (79.5 vs 89.0 mmHg) and lower pre-anchor minimum MAP (
 | Surgical group: ophthalmic | 201 (1.2) |
 | Surgical group: cardiac | 177 (1.0) |
 | Surgical group: no surgery recorded | 6 (<0.1) |
-| **Primary outcome D1, n (%)** | **2,622 (15.55)** |
+| **Primary outcome D1, n (%)** | **2,622 (15.55%)** |
 
 ### Outcome definition sensitivity
 
