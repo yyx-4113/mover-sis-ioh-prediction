@@ -130,6 +130,14 @@ add("External metrics match external_validation.json (derived)", len(ext_miss) =
     "all %d present (%s)" % (len(ext_tokens), ", ".join("%s %s" % kv for kv in ext_tokens))
     if not ext_miss else "MISSING in ms: " + ", ".join(ext_miss))
 
+# ---- mandatory editorial strings (verbatim, required by the journal) -------
+# The BMC technical check asked for this exact string. It is an external
+# requirement, not a product value, so it is quoted verbatim on purpose.
+add("Clinical trial number declaration (verbatim editorial requirement)",
+    "Clinical trial number: not applicable." in md,
+    "present" if "Clinical trial number: not applicable." in md
+    else "MISSING exact string 'Clinical trial number: not applicable.'")
+
 # ---- model performance numbers DERIVED from s3_metrics.json ----------------
 m = json.load(open(os.path.join(ROOT, "results", "s3_metrics.json"), encoding="utf-8"))
 expected = []

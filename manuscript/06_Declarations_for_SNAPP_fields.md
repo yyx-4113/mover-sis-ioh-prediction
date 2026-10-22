@@ -55,6 +55,20 @@ and rely on the free text above, which states the individual-consent waiver.
 
 ---
 
+## Clinical trial number
+
+The technical check asked for this in the **manuscript**, not in a form field, so
+it lives in `01_Manuscript.docx` under Declarations and is checked verbatim by
+`s5_gate.py`. If the form also offers a field for it, enter:
+
+> Clinical trial number: not applicable.
+
+Keep the exact wording and punctuation. The journal's own submission-guidelines
+page has not yet been updated to list this item; the requirement comes from the
+Springer Nature system.
+
+---
+
 ## Competing interests
 
 > The author declares no competing interests.

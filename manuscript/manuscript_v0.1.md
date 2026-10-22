@@ -774,6 +774,8 @@ approval number is reported. All procedures were conducted in accordance with th
 
 **Consent for publication.** Not applicable.
 
+Clinical trial number: not applicable.
+
 **Availability of data and materials.** The development cohort was drawn from MOVER (University of
 California Irvine), which is available to qualified researchers upon signature of a data use
 agreement (https://mover.ics.uci.edu/; UCI Machine Learning Repository,
