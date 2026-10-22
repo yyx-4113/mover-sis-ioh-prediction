@@ -27,6 +27,7 @@ Upload order in the SNAPP submission wizard:
 | 1. Article type | Original Article (Research) |
 | 2. Manuscript | `01_Manuscript.docx` |
 | 3. Cover letter | `02_Cover_letter.docx` |
+| 3b. Response to technical check | `07_Response_to_Technical_Check.docx` (point-by-point reply; upload in the cover-letter / query-response area) |
 | 4. Figures (upload individually) | `03_Figures/` |
 | 5. Additional files | `04_Additional_file_1_audit_trail.csv`, `05_Additional_file_2_TRIPOD_AI.docx` |
 

@@ -207,6 +207,13 @@ def build():
     shutil.copy2(s, dst)
     made.append((dst, "field-by-field declarations to paste into the SNAPP form"))
 
+    # 6b. point-by-point response to technical check -------------------------
+    rl_md = os.path.join(ROOT, "manuscript", "07_Response_to_Technical_Check.md")
+    if os.path.exists(rl_md):
+        dst = md_to_docx(rl_md,
+                         os.path.join(OUT, "07_Response_to_Technical_Check.docx"))
+        made.append((dst, "point-by-point response to technical check"))
+
     # 7. README / checklist -------------------------------------------------
     readme = os.path.join(OUT, "00_README_submission_checklist.md")
     with open(readme, "w", encoding="utf-8") as f:
@@ -251,6 +258,7 @@ Upload order in the SNAPP submission wizard:
 | 1. Article type | Original Article (Research) |
 | 2. Manuscript | `01_Manuscript.docx` |
 | 3. Cover letter | `02_Cover_letter.docx` |
+| 3b. Response to technical check | `07_Response_to_Technical_Check.docx` (point-by-point reply; upload in the cover-letter / query-response area) |
 | 4. Figures (upload individually) | `03_Figures/` |
 | 5. Additional files | `04_Additional_file_1_audit_trail.csv`, `05_Additional_file_2_TRIPOD_AI.docx` |
 
