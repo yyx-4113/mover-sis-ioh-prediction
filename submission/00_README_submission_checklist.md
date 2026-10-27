@@ -2,7 +2,7 @@
 
 **Submission site (SNAPP, Springer Nature Article Processing Platform):** https://submission.springernature.com/new-submission/12911/3
 **Journal home page:** https://link.springer.com/journal/12911
-**ISSN:** 1471-2253
+**ISSN:** 1472-6947
 **Springer Nature journal ID:** 12911
 
 ## How to reach the submission site
@@ -27,7 +27,6 @@ Upload order in the SNAPP submission wizard:
 | 1. Article type | Original Article (Research) |
 | 2. Manuscript | `01_Manuscript.docx` |
 | 3. Cover letter | `02_Cover_letter.docx` |
-| 3b. Response to technical check | `07_Response_to_Technical_Check.docx` (point-by-point reply; upload in the cover-letter / query-response area) |
 | 4. Figures (upload individually) | `03_Figures/` |
 | 5. Additional files | `04_Additional_file_1_audit_trail.csv`, `05_Additional_file_2_TRIPOD_AI.docx` |
 
@@ -41,6 +40,12 @@ Figures included (300 dpi):
 
 Additional file 1 has 250 rows: every number reported in the manuscript,
 the result file that produced it, and the command that reproduces it.
+
+## Archive (do NOT upload)
+
+`archive_prior_journal/` holds the point-by-point reply to the *previous*
+journal's (BMC Anesthesiology) technical check. It is kept for the record
+only and is **not part of this BMC MIDM submission** - do not upload it.
 
 ## Points to check before clicking Submit
 
