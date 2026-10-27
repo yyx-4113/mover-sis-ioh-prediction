@@ -8,7 +8,7 @@ verifies the manuscript matches the CURRENT products rather than protecting stal
 numbers.
 
 Checks:
-  1. Abstract word count <= 350 (BMC Anesthesiology limit)
+  1. Abstract word count <= 350 (BMC series limit)
   2. Total manuscript word count
   3. docx embeds 6 figures and 8 tables (Table 8 = sensitivity analyses)
   4. References: 21 entries, numbered contiguously 1..N

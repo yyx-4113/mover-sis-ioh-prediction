@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Build the BMC Anesthesiology submission bundle.
+"""Build the BMC Medical Informatics and Decision Making submission bundle.
 
 Assembles, into a single folder, everything the SNAPP submission
 wizard (Springer Nature Article Processing Platform) asks for:
@@ -29,11 +29,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "submission")
 FIGDIR = os.path.join(OUT, "03_Figures")
 
-JOURNAL = "BMC Anesthesiology"
-# BMC Anesthesiology migrated from Editorial Manager to SNAPP (Springer Nature
-# Article Processing Platform). 12871 is the Springer Nature journal ID.
-SUBMIT_URL = "https://submission.springernature.com/new-submission/12871/3"
-JOURNAL_URL = "https://link.springer.com/journal/12871"
+JOURNAL = "BMC Medical Informatics and Decision Making"
+# BMC MIDM is on SNAPP (Springer Nature Article Processing Platform), as are other
+# BMC Series titles. 12911 is the Springer Nature journal ID.
+SUBMIT_URL = "https://submission.springernature.com/new-submission/12911/3"
+JOURNAL_URL = "https://link.springer.com/journal/12911"
 ISSN = "1471-2253"
 
 
@@ -166,7 +166,7 @@ def build():
                       "references, figure legends, tables 1-8)"))
 
     # 2. cover letter -------------------------------------------------------
-    cl_md = os.path.join(ROOT, "manuscript", "cover_letter_bmc_anesthesiology.md")
+    cl_md = os.path.join(ROOT, "manuscript", "cover_letter_bmc_midm.md")
     dst = md_to_docx(cl_md, os.path.join(OUT, "02_Cover_letter.docx"),
                      title_center=True)
     made.append((dst, "cover letter (Times New Roman 12 pt)"))
@@ -234,7 +234,7 @@ README = """# Submission bundle - {journal}
 **Submission site (SNAPP, Springer Nature Article Processing Platform):** {url}
 **Journal home page:** {jurl}
 **ISSN:** {issn}
-**Springer Nature journal ID:** 12871
+**Springer Nature journal ID:** 12911
 
 ## How to reach the submission site
 

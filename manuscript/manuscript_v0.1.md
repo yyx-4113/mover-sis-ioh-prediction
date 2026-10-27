@@ -1,4 +1,4 @@
-# Prediction of intraoperative hypotension exposure from data available at anaesthesia induction: development and internal validation in MOVER/SIS with an external transportability check in VitalDB
+# Transparent, leakage-audited prediction of cumulative intraoperative hypotension burden from anaesthesia-induction data, with an external transportability check and quantification of sparse noninvasive blood pressure constraints
 
 **Yongxin Yang**¹  ORCID 0009-0004-9698-6552
 
@@ -11,13 +11,13 @@ Correspondence: Yongxin Yang, 960856791@qq.com
 
 ## Abstract
 
-**Background:** Intraoperative hypotension is associated with kidney and myocardial injury. Machine-learning performance estimates vary widely. We developed and internally validated a model predicting hypotensive exposure (at least 30% of recorded post-anchor mean arterial pressure readings below 65 mmHg) over the remainder of surgery from data available at the anaesthesia induction anchor, and examined its transportability in an external cohort.
+**Background:** Machine-learning estimates for intraoperative hypotension vary widely, with near-perfect discrimination reported on the same resource we analyse. Such estimates are hard to reconcile with the coarse information content of sparse, intermittent noninvasive blood pressure. We developed and internally validated a transparent, leakage-audited model predicting hypotensive exposure (≥30% of post-anchor MAP readings <65 mmHg) over the remainder of surgery from induction-anchor data, and examined its transportability in an external cohort.
 
-**Methods:** Retrospective cohort from MOVER/SIS. Of 19,114 screened records, 16,861 adult cases had a valid anchor (first intubation event, 82.0%; otherwise surgery start, 18.0%). The primary outcome required ≥10 mean arterial pressure (MAP) measurements after the anchor with ≥30% below 65 mmHg. Predictors were truncated at the anchor; four models were fitted (baseline, full logistic, XGBoost, LightGBM). Validation used patient-level (primary) and temporal (secondary) splits; the unchanged MOVER core model was also applied to the VitalDB arterial cohort (n = 3,735; anchor adapted from intubation to operation start; no refitting) as a transportability check. AUPRC was the primary metric; AUROC and Brier score were secondary; 95% confidence intervals came from 1,000 bootstrap resamples; isotonic calibration and decision curve analysis were performed.
+**Methods:** Retrospective MOVER/SIS cohort; 16,861 adult cases with a valid anchor (first intubation 13,834, 82.0%; else surgery start 3,027, 18.0%). Primary outcome: ≥10 post-anchor MAP readings with ≥30% below 65 mmHg. Predictors truncated at the anchor; four models fitted (baseline, full logistic, XGBoost, LightGBM). Validation used patient-level (primary) and temporal (secondary) splits; the unchanged core model was applied unrefitted to VitalDB (of 6,388 cases, n = 3,735 eligible; anchor adapted to operation start) as a transportability check. AUPRC was primary; AUROC, Brier, 1,000 bootstrap CIs, isotonic calibration and decision curve analysis were performed.
 
-**Results:** The outcome occurred in 2,622 of 16,861 cases (15.55%). XGBoost achieved AUPRC 0.347 (95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split, versus 0.233 (baseline), 0.301 (full logistic) and 0.338 (LightGBM); on the temporal split it achieved 0.339 (0.291–0.395) and 0.733 (0.703–0.762). Isotonic recalibration improved the Brier score from 0.191 to 0.119. Subgroup AUPRC tracked stratum prevalence; pre-anchor mean MAP was the dominant predictor. Externally (VitalDB, prevalence 5.73%), the unchanged model retained discrimination (AUROC 0.744, 95% CI 0.705–0.778; AUPRC 0.158, 0.126–0.202) but probabilities were uncalibrated; the 53-feature internal AUROC was 0.698–0.710, confirming transportability rather than like-for-like validation.
+**Results:** The outcome occurred in 2,622/16,861 cases (15.55%). XGBoost achieved AUPRC 0.347 (95% CI 0.309–0.387) and AUROC 0.722 (0.697–0.745) on the patient-level split versus 0.233 (baseline), 0.301 (logistic) and 0.338 (LightGBM); temporal split 0.339/0.733. Isotonic recalibration improved Brier from 0.191 to 0.119; pre-anchor mean MAP dominated. Externally (VitalDB, prevalence 5.73%, 214 events) the unchanged model retained discrimination (AUROC 0.744, 0.705–0.778; AUPRC 0.158, 0.126–0.202) but probabilities were uncalibrated; 53-feature internal AUROC 0.698–0.710 confirmed transportability, not like-for-like validation.
 
-**Conclusions:** An anchor-based model using routinely recorded pre-induction data achieved modest but non-null discrimination for intraoperative hypotensive exposure and was well calibrated. An external transportability check in VitalDB supported transfer of ranking but not of absolute probabilities, requiring local recalibration before clinical use.
+**Conclusions:** Within a fully leakage-audited framework, an anchor-based model using routinely recorded pre-induction data achieved modest but non-null, well-calibrated discrimination for intraoperative hypotensive exposure. An external transportability check in VitalDB supported transfer of ranking but not of absolute probabilities, requiring local recalibration before clinical use. We quantify the ceiling that sparse noninvasive blood pressure imposes on such prediction and provide a transparent, auditable pipeline generalisable to similar resources.
 
 **Keywords:** intraoperative hypotension; machine learning; clinical prediction model; mean arterial pressure; perioperative medicine; calibration; TRIPOD
 
@@ -735,7 +735,7 @@ in perioperative hypotension prediction and that hold independently of the discr
 
 ## Conclusions
 
-Using only data available at the anaesthesia induction anchor, a gradient-boosted model achieved
+A fully leakage-audited, gradient-boosted model using only data available at the anaesthesia induction anchor achieved
 modest but non-null discrimination (AUPRC 0.347, AUROC 0.722) for intraoperative
 hypotensive exposure, reproduced under temporal validation and well calibrated after isotonic
 recalibration. In an independent external cohort (VitalDB, n = 3,735) the same model retained

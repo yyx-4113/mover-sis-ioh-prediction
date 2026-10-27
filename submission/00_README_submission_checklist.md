@@ -1,15 +1,15 @@
-# Submission bundle - BMC Anesthesiology
+# Submission bundle - BMC Medical Informatics and Decision Making
 
-**Submission site (SNAPP, Springer Nature Article Processing Platform):** https://submission.springernature.com/new-submission/12871/3
-**Journal home page:** https://link.springer.com/journal/12871
+**Submission site (SNAPP, Springer Nature Article Processing Platform):** https://submission.springernature.com/new-submission/12911/3
+**Journal home page:** https://link.springer.com/journal/12911
 **ISSN:** 1471-2253
-**Springer Nature journal ID:** 12871
+**Springer Nature journal ID:** 12911
 
 ## How to reach the submission site
 
 Open the journal home page and click **Submit your manuscript**; or paste the
 direct link above. Either route lands on the Springer Nature sign-in page, which
-states "continue with your submission to BMC Anesthesiology".
+states "continue with your submission to BMC Medical Informatics and Decision Making".
 
 Sign in with **ORCID** (recommended, it links the submission to
 0009-0004-9698-6552), or with a Springer Nature account, or with Google. The

@@ -5,7 +5,7 @@ result files for the manuscript:
 
 > Prediction of sustained intraoperative hypotension burden from data available at
 > anaesthesia induction: model development and internal validation in the MOVER/SIS cohort
-> Yongxin Yang (single author). Target journal: BMC Anesthesiology.
+> Yongxin Yang (single author). Target journal: BMC Medical Informatics and Decision Making.
 
 ## Data access
 
