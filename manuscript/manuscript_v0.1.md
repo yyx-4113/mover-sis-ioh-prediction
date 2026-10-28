@@ -785,7 +785,7 @@ Lee et al. (2022), doi:10.1038/s41597-022-01411-5. Patient-level data are not re
 author, as the MOVER data use agreement does not permit this. All analysis code, the configuration
 file, the audit trail, and the aggregate result files
 from which every number in this manuscript is generated are available at
-https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.1 (v1.0.1 reproduction package), together with a manifest of
+https://github.com/yyx-4113/mover-sis-ioh-prediction/releases/tag/v1.0.2 (v1.0.2 reproduction package), together with a manifest of
 file checksums (MANIFEST.csv). Patient-level derived files (per-case feature matrix and outcome
 labels) are regenerable from the MOVER source under the data use agreement by running the provided
 pipeline (scripts/run_all.py).
