@@ -778,7 +778,7 @@ Clinical trial number: not applicable.
 
 **Availability of data and materials.** The development cohort was drawn from MOVER (University of
 California Irvine), which is available to qualified researchers upon signature of a data use
-agreement (https://mover.ics.uci.edu/; UCI Machine Learning Repository,
+agreement (https://archive.ics.uci.edu/dataset/877/mover:+medical+informatics+operating+room+vitals+and+events+repository; UCI Machine Learning Repository,
 https://doi.org/10.24432/C5VS5G). The external cohort was drawn from VitalDB
 (https://vitaldb.net/), which is publicly accessible upon free registration and is described in
 Lee et al. (2022), doi:10.1038/s41597-022-01411-5. Patient-level data are not redistributed by the
